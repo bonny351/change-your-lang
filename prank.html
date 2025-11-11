@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Made-Up Language Translator</title>
+<style>
+  body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #7a0c0c, #000);
+    color: #fff;
+    text-align: center;
+    padding: 30px;
+  }
+  textarea {
+    width: 90%;
+    max-width: 600px;
+    height: 120px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    margin: 10px 0;
+    font-size: 1em;
+  }
+  button {
+    background: #7a0c0c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+  }
+  button:hover {
+    background: #a01515;
+  }
+  .output {
+    margin-top: 20px;
+    font-size: 1.2em;
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+  <h1>Made-Up Language Translator</h1>
+  <p>Type text below, then translate it 3 letters up or 10 letters down.</p>
+
+  <textarea id="inputText" placeholder="Enter English or German text..."></textarea><br>
+  <button onclick="translateUp()">3 Letters Up</button>
+  <button onclick="translateDown()">10 Letters Down</button>
+
+  <div class="output" id="madeUpOutput"></div>
+  <div class="output" id="germanOutput"></div>
+
+<script>
+function shiftLetter(c, shift) {
+  const code = c.charCodeAt(0);
+  if (code >= 65 && code <= 90) { // Uppercase
+    return String.fromCharCode(((code - 65 + shift) % 26 + 26) % 26 + 65);
+  } else if (code >= 97 && code <= 122) { // Lowercase
+    return String.fromCharCode(((code - 97 + shift) % 26 + 26) % 26 + 97);
+  } else return c;
+}
+
+function shiftText(text, shift) {
+  return text.split('').map(c => shiftLetter(c, shift)).join('');
+}
+
+// simple sample German dictionary
+const germanDictionary = {
+  hello: "hallo",
+  love: "liebe",
+  you: "du",
+  good: "gut",
+  world: "welt",
+  test: "prüfung",
+  day: "tag"
+};
+
+function toGerman(text) {
+  return text.split(/\b/).map(word => {
+    const lower = word.toLowerCase();
+    return germanDictionary[lower] ? germanDictionary[lower] : word;
+  }).join('');
+}
+
+function translateUp() {
+  const text = document.getElementById("inputText").value;
+  const madeUp = shiftText(text, 3);
+  document.getElementById("madeUpOutput").innerText = "Made-Up (3 letters up):\n" + madeUp;
+  document.getElementById("germanOutput").innerText = "German Translation:\n" + toGerman(madeUp.toLowerCase());
+}
+
+function translateDown() {
+  const text = document.getElementById("inputText").value;
+  const madeUp = shiftText(text, -10);
+  document.getElementById("madeUpOutput").innerText = "Made-Up (10 letters down):\n" + madeUp;
+  document.getElementById("germanOutput").innerText = "German Translation:\n" + toGerman(madeUp.toLowerCase());
+}
+</script>
+</body>
+</html>

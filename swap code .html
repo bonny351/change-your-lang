@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Binary ↔ English Translator</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #7a0c0c, #000);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2em;
+      color: #ffcccc;
+      text-shadow: 0 0 10px #7a0c0c;
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 90%;
+      max-width: 600px;
+      height: 120px;
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #111;
+      color: #fff;
+      font-size: 1em;
+      resize: none;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      background: #7a0c0c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #a00;
+      transform: scale(1.05);
+    }
+    #output {
+      margin-top: 20px;
+      font-family: monospace;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 600px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Binary ↔ English Translator</h1>
+
+  <textarea id="inputText" placeholder="Type English or Binary here..."></textarea>
+  <div class="buttons">
+    <button onclick="toBinary()">English → Binary</button>
+    <button onclick="toEnglish()">Binary → English</button>
+    <button onclick="clearFields()">Clear</button>
+  </div>
+
+  <div id="output"></div>
+
+  <script>
+    function toBinary() {
+      const text = document.getElementById("inputText").value;
+      let binary = "";
+      for (let i = 0; i < text.length; i++) {
+        binary += text[i].charCodeAt(0).toString(2).padStart(8, "0") + " ";
+      }
+      document.getElementById("output").textContent = binary.trim();
+    }
+
+    function toEnglish() {
+      const binaryText = document.getElementById("inputText").value.trim();
+      const binaryArray = binaryText.split(" ");
+      let text = "";
+      for (let i = 0; i < binaryArray.length; i++) {
+        if (binaryArray[i].length === 8) {
+          text += String.fromCharCode(parseInt(binaryArray[i], 2));
+        }
+      }
+      document.getElementById("output").textContent = text || "(Invalid binary)";
+    }
+
+    function clearFields() {
+      document.getElementById("inputText").value = "";
+      document.getElementById("output").textContent = "";
+    }
+  </script>
+</body>
+</html>
