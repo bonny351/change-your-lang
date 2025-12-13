@@ -8,7 +8,8 @@
 html,body{
   margin:0;width:100%;height:100%;
   font-family:Segoe UI,Arial,sans-serif;
-  color:#eafff7;overflow:hidden;background:black;
+  background:black;color:#eafff7;
+  overflow:hidden;
 }
 body{
   background:url("background.jpg") center/cover no-repeat fixed;
@@ -17,9 +18,7 @@ body{
   position:fixed;inset:0;
   background:radial-gradient(circle,rgba(0,0,0,.25),rgba(0,0,0,.7));
 }
-#waves{
-  position:fixed;inset:0;pointer-events:none;
-}
+#waves{position:fixed;inset:0;pointer-events:none}
 #home,#player{position:relative;z-index:2}
 
 /* HOME */
@@ -45,12 +44,11 @@ body{
   align-items:center;
   justify-content:center;
   cursor:pointer;
+  color:white;
   box-shadow:0 0 40px currentColor;
   border:3px solid rgba(255,255,255,.15);
-  color:#fff;
 }
 .profile-name{
-  color:#ffffff;
   font-size:22px;
   font-weight:600;
   text-shadow:0 2px 8px rgba(0,0,0,.6);
@@ -66,17 +64,23 @@ body{
 /* PLAYER */
 #player{display:none;padding:40px 60px}
 .songTitle{font-size:34px;margin-bottom:10px}
-.controls{margin:20px 0;display:flex;gap:25px}
+.controls{display:flex;gap:25px;margin:20px 0}
 .ctrl{
-  font-size:30px;padding:14px;border-radius:50%;
-  background:rgba(0,255,200,.25);cursor:pointer;
+  font-size:30px;
+  padding:14px;
+  border-radius:50%;
+  background:rgba(0,255,200,.25);
+  cursor:pointer;
 }
 .playlists{
-  display:grid;grid-template-columns:1fr 1fr;gap:30px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
 }
 .panel{
   background:rgba(0,255,200,.1);
-  border-radius:18px;padding:18px;
+  border-radius:18px;
+  padding:18px;
 }
 .list{max-height:220px;overflow-y:auto}
 .track{
@@ -88,7 +92,6 @@ body{
 input{
   width:100%;
   padding:12px;
-  font-size:16px;
   border-radius:10px;
   border:none;
   margin-bottom:10px;
@@ -116,15 +119,8 @@ input{
   display:none;
   z-index:10;
 }
-.findResult{
-  padding:14px;
-  border-bottom:1px solid rgba(255,255,255,.1);
-}
-.findActions{
-  display:flex;
-  gap:12px;
-  margin-top:6px;
-}
+.findResult{padding:14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.findActions{display:flex;gap:12px;margin-top:6px}
 </style>
 </head>
 
@@ -136,24 +132,12 @@ input{
 <div id="home">
   <div id="profileTitle">Who’s listening?</div>
 
-  <div class="profile isaiah" onclick="openProfile('Isaiah')">
-    <span class="profile-name">Isaiah</span>
-  </div>
-  <div class="profile ryans" onclick="openProfile('Ryan’s Fam')">
-    <span class="profile-name">Ryan’s Fam</span>
-  </div>
-  <div class="profile wakena" onclick="openProfile('Wakena')">
-    <span class="profile-name">Wakena</span>
-  </div>
-  <div class="profile elijah" onclick="openProfile('Elijah')">
-    <span class="profile-name">Elijah</span>
-  </div>
-  <div class="profile pappa" onclick="openProfile('Pappa')">
-    <span class="profile-name">Pappa</span>
-  </div>
-  <div class="profile guest" onclick="openProfile('Guest')">
-    <span class="profile-name">Guest</span>
-  </div>
+  <div class="profile isaiah" onclick="openProfile('Isaiah')"><span class="profile-name">Isaiah</span></div>
+  <div class="profile ryans" onclick="openProfile('Ryan’s Fam')"><span class="profile-name">Ryan’s Fam</span></div>
+  <div class="profile wakena" onclick="openProfile('Wakena')"><span class="profile-name">Wakena</span></div>
+  <div class="profile elijah" onclick="openProfile('Elijah')"><span class="profile-name">Elijah</span></div>
+  <div class="profile pappa" onclick="openProfile('Pappa')"><span class="profile-name">Pappa</span></div>
+  <div class="profile guest" onclick="openProfile('Guest')"><span class="profile-name">Guest</span></div>
 </div>
 
 <div id="player">
@@ -194,27 +178,23 @@ input{
 /* ===== STATE ===== */
 let tracks=[],current=0;
 
-/* ===== AUDIO CORE ===== */
+/* ===== AUDIO (CORRECT & SAFE) ===== */
 const audio=document.getElementById("audio");
 const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
 const analyser=audioCtx.createAnalyser();
 analyser.fftSize=256;
-let source=audioCtx.createMediaElementSource(audio);
+
+const source=audioCtx.createMediaElementSource(audio);
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
+
 const dataArray=new Uint8Array(analyser.frequencyBinCount);
 
 function loadAndPlay(src){
   audio.pause();
   audio.src=src;
   audioCtx.resume();
-
-  try{source.disconnect();}catch(e){}
-  source=audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  audio.play();
+  audio.play().catch(()=>{});
 }
 
 /* ===== PROFILE ===== */
@@ -258,7 +238,7 @@ function render(){
   });
 }
 
-/* ===== SEARCH FILTER ===== */
+/* ===== SEARCH ===== */
 search.oninput=e=>{
   const q=e.target.value.toLowerCase();
   [...songs.children].forEach(d=>{
@@ -276,21 +256,17 @@ finderSearch.onkeydown=e=>{
 
 async function searchArchive(q){
   finderResults.innerHTML="Searching…";
-  const r=await fetch(
-    `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)} AND mediatype:audio&rows=12&output=json`
-  );
+  const r=await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)} AND mediatype:audio&rows=10&output=json`);
   const data=await r.json();
   finderResults.innerHTML="";
-
   for(const d of data.response.docs){
-    const title=d.identifier;
     const div=document.createElement("div");
     div.className="findResult";
     div.innerHTML=`
-      <div>${title}</div>
+      <div>${d.identifier}</div>
       <div class="findActions">
         <div class="btn" onclick="previewArchive('${d.identifier}')">▶ Preview</div>
-        <div class="btn" onclick="downloadArchive('${d.identifier}','${title}')">⬇ Download</div>
+        <div class="btn" onclick="downloadArchive('${d.identifier}')">⬇ Download</div>
       </div>`;
     finderResults.appendChild(div);
   }
@@ -308,17 +284,13 @@ async function previewArchive(id){
   loadAndPlay(`https://archive.org/download/${id}/${mp3.name}`);
 }
 
-async function downloadArchive(id,title){
+async function downloadArchive(id){
   const mp3=await getArchiveMP3(id);
   if(!mp3)return alert("No MP3 found");
 
-  const remote=`https://archive.org/download/${id}/${mp3.name}`;
-  const blob=await (await fetch(remote)).blob();
-  const local=URL.createObjectURL(blob);
-
-  const safeName=title.replace(/[^a-z0-9 _-]/gi,"").trim()||"Track";
-
-  tracks.push({name:safeName+".mp3",src:local});
+  const blob=await (await fetch(`https://archive.org/download/${id}/${mp3.name}`)).blob();
+  const url=URL.createObjectURL(blob);
+  tracks.push({name:mp3.name,src:url});
   render();
 }
 
