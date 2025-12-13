@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Spa Music Kiosk – Full Preview</title>
+
+<style>
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:#050d14;
+  color:white;
+  font-family:Arial, sans-serif;
+  overflow:hidden;
+}
+
+/* ---------- GLOBAL ---------- */
+.hidden{display:none}
+button{
+  background:#1db954;
+  border:none;
+  border-radius:12px;
+  padding:14px 30px;
+  font-size:18px;
+}
+button:active{transform:scale(.95)}
+input{
+  width:90%;
+  display:block;
+  margin:10px auto;
+  padding:14px;
+  font-size:18px;
+  border-radius:12px;
+  border:none;
+}
+
+/* ---------- RIPPLE ---------- */
+#ripple{
+  position:absolute;
+  inset:0;
+  z-index:0;
+}
+
+/* ---------- HOME ---------- */
+#home{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:40px;
+  justify-content:center;
+  align-items:center;
+  z-index:2;
+}
+.profile{
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:radial-gradient(circle,#1db954,#0e5f30);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:20px;
+  box-shadow:0 0 40px rgba(29,185,84,.5);
+}
+
+/* ---------- PROFILE PAGE ---------- */
+#profile{
+  position:absolute;
+  inset:0;
+  z-index:2;
+}
+h1{text-align:center;margin:15px 0}
+.song{
+  padding:18px 24px;
+  border-bottom:1px solid #222;
+  font-size:20px;
+}
+.song.playing{
+  background:#1db954;
+  color:black;
+}
+
+/* ---------- STORAGE BAR ---------- */
+#storageWrap{
+  width:90%;
+  margin:10px auto;
+}
+#storage{
+  height:10px;
+  background:#222;
+  border-radius:6px;
+  overflow:hidden;
+}
+#used{
+  height:100%;
+  width:40%;
+  background:#1db954;
+}
+#storageText{
+  font-size:14px;
+  opacity:.7;
+  margin-top:6px;
+}
+
+/* ---------- VISUALIZER ---------- */
+#viz{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:140px;
+  opacity:.25;
+}
+
+/* ---------- FOOTER ---------- */
+#footer{
+  position:fixed;
+  bottom:20px;
+  width:100%;
+  text-align:center;
+}
+.notice{
+  font-size:14px;
+  opacity:.6;
+  margin-bottom:10px;
+}
+.adminHint{
+  position:fixed;
+  top:10px;
+  right:15px;
+  font-size:12px;
+  opacity:.15;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="ripple"></canvas>
+
+<!-- HOME -->
+<div id="home">
+  <div class="profile" onclick="openProfile('Isaiah')">Isaiah</div>
+  <div class="profile" onclick="openProfile('Guest')">Guest</div>
+  <div class="profile">Ryan’s Fam</div>
+  <div class="profile">Wakena</div>
+  <div class="profile">Elijah</div>
+  <div class="profile">Pappa</div>
+</div>
+
+<!-- PROFILE -->
+<div id="profile" class="hidden">
+  <h1 id="title"></h1>
+  <input id="search" placeholder="Search music…">
+  <div id="storageWrap">
+    <div id="storage"><div id="used"></div></div>
+    <div id="storageText"></div>
+  </div>
+  <div id="songs"></div>
+
+  <div id="footer">
+    <div id="guestNote" class="notice hidden">Guest music resets on log out</div>
+    <button onclick="logout()">Log Out</button>
+  </div>
+</div>
+
+<div class="adminHint">hold corner = admin</div>
+<canvas id="viz"></canvas>
+
+<script>
+/* ---------- RIPPLE ENGINE ---------- */
+const rc=document.getElementById("ripple"),rx=rc.getContext("2d");
+let r=[];
+function rs(){rc.width=innerWidth;rc.height=innerHeight}
+onresize=rs;rs();
+addEventListener("pointerdown",e=>r.push({x:e.clientX,y:e.clientY,d:0,o:.6}));
+(function rd(){
+  rx.clearRect(0,0,rc.width,rc.height);
+  r.forEach(p=>{
+    rx.beginPath();
+    rx.arc(p.x,p.y,p.d,0,Math.PI*2);
+    rx.strokeStyle=`rgba(100,200,255,${p.o})`;
+    rx.lineWidth=2;rx.shadowBlur=20;
+    rx.shadowColor="rgba(100,200,255,.8)";
+    rx.stroke();
+    p.d+=3;p.o-=.008;
+  });
+  r=r.filter(p=>p.o>0);
+  requestAnimationFrame(rd);
+})();
+
+/* ---------- DATA ---------- */
+const allSongs=[
+ "Chill Waves.mp3",
+ "Night Pool Vibes.mp3",
+ "Ambient Drift.mp3",
+ "Deep Spa Relax.mp3",
+ "Late Night Focus.mp3"
+];
+let playing=null;
+
+/* ---------- PROFILE LOGIC ---------- */
+function openProfile(name){
+ document.getElementById("home").classList.add("hidden");
+ document.getElementById("profile").classList.remove("hidden");
+ document.getElementById("title").textContent=name;
+ document.getElementById("guestNote").classList.toggle("hidden",name!=="Guest");
+
+ document.getElementById("used").style.width=name==="Guest"?"20%":"45%";
+ document.getElementById("storageText").textContent=
+  name==="Guest"?"3.2 GB / 15 GB (temporary)":"6.8 GB / 15 GB";
+
+ render(allSongs);
+}
+
+/* ---------- PLAYLIST ---------- */
+function render(list){
+ const box=document.getElementById("songs");
+ box.innerHTML="";
+ list.forEach(s=>{
+  const d=document.createElement("div");
+  d.className="song"+(s===playing?" playing":"");
+  d.textContent=s;
+  d.onclick=()=>{
+   playing=s;
+   render(list);
+  };
+  box.appendChild(d);
+ });
+}
+
+document.getElementById("search").oninput=e=>{
+ const q=e.target.value.toLowerCase();
+ render(allSongs.filter(s=>s.toLowerCase().includes(q)));
+};
+
+/* ---------- LOGOUT ---------- */
+function logout(){
+ playing=null;
+ document.getElementById("profile").classList.add("hidden");
+ document.getElementById("home").classList.remove("hidden");
+}
+
+/* ---------- VISUALIZER ---------- */
+const vc=document.getElementById("viz"),vx=vc.getContext("2d");
+function vs(){vc.width=innerWidth;vc.height=140}
+vs();
+(function vd(){
+ vx.clearRect(0,0,vc.width,vc.height);
+ for(let i=0;i<40;i++){
+  const h=Math.sin(Date.now()/400+i)*30+60;
+  vx.fillStyle="rgba(100,200,255,.6)";
+  vx.fillRect(i*vc.width/40,vc.height-h,vc.width/80,h);
+ }
+ requestAnimationFrame(vd);
+})();
+</script>
+
+</body>
+</html>
