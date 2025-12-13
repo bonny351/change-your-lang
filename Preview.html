@@ -120,6 +120,7 @@ input{
   border-radius:14px;
   background:rgba(0,255,200,.25);
   cursor:pointer;
+  user-select:none;
 }
 
 /* FINDER */
@@ -136,19 +137,11 @@ input{
 .findResult{
   padding:14px;
   border-bottom:1px solid rgba(255,255,255,.1);
-  cursor:pointer;
 }
-
-/* ADMIN */
-#admin{
-  position:fixed;
-  inset:12%;
-  background:rgba(0,0,0,.85);
-  backdrop-filter:blur(18px);
-  border-radius:30px;
-  padding:30px;
-  z-index:20;
-  display:none;
+.findActions{
+  display:flex;
+  gap:12px;
+  margin-top:6px;
 }
 </style>
 </head>
@@ -204,22 +197,14 @@ input{
   <div class="btn" onclick="closeFinder()">Close</div>
 </div>
 
-<div id="admin">
-  <h2>Admin</h2>
-  <div class="btn" onclick="clearProfile()">Clear Profile</div>
-  <div class="btn" onclick="location.reload()">Restart</div>
-  <div class="btn" onclick="admin.style.display='none'">Close</div>
-</div>
-
 <audio id="audio"></audio>
 
 <script>
-/* STATE */
-let profile="",tracks=[],current=0;
+/* ===== STATE ===== */
+let tracks=[],current=0;
 
 /* PROFILE */
 function openProfile(n){
-  profile=n;
   who.textContent="Now Playing for "+n;
   home.style.display="none";
   player.style.display="block";
@@ -278,34 +263,59 @@ finderSearch.onkeydown=e=>{
 
 async function searchArchive(q){
   finderResults.innerHTML="Searching…";
-  const r=await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)} AND mediatype:audio&fl[]=identifier&fl[]=title&rows=15&output=json`);
+  const r=await fetch(
+    `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)} AND mediatype:audio&fl[]=identifier&fl[]=title&rows=15&output=json`
+  );
   const data=await r.json();
   finderResults.innerHTML="";
+
   for(const d of data.response.docs){
+    const title=d.title||d.identifier;
     const div=document.createElement("div");
     div.className="findResult";
-    div.textContent=d.title||d.identifier;
-    div.onclick=()=>loadArchiveItem(d.identifier,d.title||d.identifier);
+    div.innerHTML=`
+      <div>🎵 ${title}</div>
+      <div class="findActions">
+        <div class="btn" onclick="previewArchive('${d.identifier}')">▶ Preview</div>
+        <div class="btn" onclick="downloadArchive('${d.identifier}','${title.replace(/'/g,"")}')">⬇ Download Now</div>
+      </div>
+    `;
     finderResults.appendChild(div);
   }
 }
 
-async function loadArchiveItem(id,title){
+async function getArchiveMP3(id){
   const r=await fetch(`https://archive.org/metadata/${id}`);
   const data=await r.json();
-  const mp3=data.files.find(f=>f.name.endsWith(".mp3"));
-  if(!mp3)return alert("No MP3 found");
-  const url=`https://archive.org/download/${id}/${mp3.name}`;
-  audio.src=url;
-  audio.play();
-  if(confirm(`Add "${title}"?`)){
-    tracks.push({name:title+".mp3",url});
-    render();
-    closeFinder();
-  }
+  return data.files.find(f=>f.name.endsWith(".mp3"));
 }
 
-/* WAVES + AUDIO SYNC */
+async function previewArchive(id){
+  const mp3=await getArchiveMP3(id);
+  if(!mp3)return alert("No MP3 found");
+  audio.src=`https://archive.org/download/${id}/${mp3.name}`;
+  audio.play();
+}
+
+async function downloadArchive(id,title){
+  const mp3=await getArchiveMP3(id);
+  if(!mp3)return alert("No MP3 found");
+
+  const url=`https://archive.org/download/${id}/${mp3.name}`;
+
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=title+".mp3";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  tracks.push({name:title+".mp3",url});
+  render();
+  closeFinder();
+}
+
+/* WAVES SYNC */
 const waveCanvas=document.getElementById("waves");
 const wctx=waveCanvas.getContext("2d");
 function resize(){waveCanvas.width=innerWidth;waveCanvas.height=innerHeight}
@@ -343,25 +353,6 @@ function drawWaves(){
   requestAnimationFrame(drawWaves);
 }
 drawWaves();
-
-/* ADMIN Z-SWIPE */
-let swipe=[],sx=0,sy=0;
-document.addEventListener("touchstart",e=>{
-  sx=e.touches[0].clientX;
-  sy=e.touches[0].clientY;
-});
-document.addEventListener("touchend",e=>{
-  const dx=e.changedTouches[0].clientX-sx;
-  const dy=e.changedTouches[0].clientY-sy;
-  if(Math.abs(dx)>80 && Math.abs(dx)>Math.abs(dy)){
-    swipe.push(dx>0?"R":"L");
-    if(swipe.join("")==="RLR"){
-      admin.style.display="block";
-      swipe=[];
-    }
-    if(swipe.length>3)swipe.shift();
-  }
-});
 </script>
 
 </body>
