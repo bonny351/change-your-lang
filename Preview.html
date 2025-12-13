@@ -18,13 +18,16 @@ body{
   background:url("background.jpg") center/cover no-repeat fixed;
 }
 #overlay{
-  position:fixed;inset:0;
+  position:fixed;
+  inset:0;
   background:radial-gradient(circle,rgba(0,0,0,.25),rgba(0,0,0,.7));
   z-index:0;
 }
 #waves{
-  position:fixed;inset:0;
-  z-index:1;pointer-events:none;
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
 }
 #home,#player{position:relative;z-index:2}
 
@@ -120,7 +123,6 @@ input{
   border-radius:14px;
   background:rgba(0,255,200,.25);
   cursor:pointer;
-  user-select:none;
 }
 
 /* FINDER */
@@ -200,10 +202,10 @@ input{
 <audio id="audio"></audio>
 
 <script>
-/* ===== STATE ===== */
+/* ================= STATE ================= */
 let tracks=[],current=0;
 
-/* PROFILE */
+/* ================= PROFILE ================= */
 function openProfile(n){
   who.textContent="Now Playing for "+n;
   home.style.display="none";
@@ -215,7 +217,7 @@ function goHome(){
   home.style.display="grid";
 }
 
-/* PLAYBACK */
+/* ================= PLAYBACK ================= */
 function play(i){
   current=i;
   const t=tracks[i];
@@ -226,14 +228,14 @@ function toggle(){audio.paused?audio.play():audio.pause()}
 function next(){tracks.length&&play((current+1)%tracks.length)}
 function prev(){tracks.length&&play((current-1+tracks.length)%tracks.length)}
 
-/* FILES */
+/* ================= FILES ================= */
 function addFiles(files){
   for(const f of files)tracks.push({name:f.name,file:f});
   render();
 }
 function clearProfile(){tracks=[];render()}
 
-/* RENDER */
+/* ================= RENDER ================= */
 function render(){
   songs.innerHTML="";
   tracks.forEach((t,i)=>{
@@ -245,7 +247,7 @@ function render(){
   });
 }
 
-/* SEARCH FILTER */
+/* ================= SEARCH FILTER ================= */
 search.oninput=e=>{
   const q=e.target.value.toLowerCase();
   [...songs.children].forEach(d=>{
@@ -253,7 +255,7 @@ search.oninput=e=>{
   });
 };
 
-/* FINDER */
+/* ================= FINDER ================= */
 function openFinder(){finder.style.display="block"}
 function closeFinder(){finder.style.display="none"}
 
@@ -284,22 +286,28 @@ async function searchArchive(q){
   }
 }
 
+/* ================= ARCHIVE HELPERS ================= */
 async function getArchiveMP3(id){
   const r=await fetch(`https://archive.org/metadata/${id}`);
   const data=await r.json();
-  return data.files.find(f=>f.name.endsWith(".mp3"));
+  return data.files.find(f=>f.name && f.name.toLowerCase().endsWith(".mp3"));
 }
 
+/* 🔧 FIXED PREVIEW (gesture-safe) */
 async function previewArchive(id){
+  audio.src="";
+  audio.play().catch(()=>{});   // unlock audio on tap
+
   const mp3=await getArchiveMP3(id);
-  if(!mp3)return alert("No MP3 found");
+  if(!mp3) return alert("No MP3 found");
+
   audio.src=`https://archive.org/download/${id}/${mp3.name}`;
   audio.play();
 }
 
 async function downloadArchive(id,title){
   const mp3=await getArchiveMP3(id);
-  if(!mp3)return alert("No MP3 found");
+  if(!mp3) return alert("No MP3 found");
 
   const url=`https://archive.org/download/${id}/${mp3.name}`;
 
@@ -315,7 +323,7 @@ async function downloadArchive(id,title){
   closeFinder();
 }
 
-/* WAVES SYNC */
+/* ================= WAVES (AUDIO SYNC) ================= */
 const waveCanvas=document.getElementById("waves");
 const wctx=waveCanvas.getContext("2d");
 function resize(){waveCanvas.width=innerWidth;waveCanvas.height=innerHeight}
