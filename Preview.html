@@ -2,20 +2,21 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Spa Music Kiosk</title>
+<title>Spa Music – Web</title>
 
 <style>
 html,body{
   margin:0;
   width:100%;
   height:100%;
-  font-family:"Segoe UI", Arial, sans-serif;
+  background:#031018;
+  font-family:"Segoe UI",Arial,sans-serif;
   color:#eafff7;
   overflow:hidden;
-  background:#031018;
 }
+.hidden{display:none}
 
-/* ---------- BACKGROUND ---------- */
+/* Background */
 body::before{
   content:"";
   position:absolute;
@@ -26,51 +27,36 @@ body::before{
   z-index:-2;
 }
 
-/* ---------- RIPPLE ---------- */
-canvas#ripple{
-  position:absolute;
-  inset:0;
-  z-index:-1;
-}
-
-/* ---------- HOME ---------- */
+/* Home */
 #home{
   position:absolute;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:90px;
+  gap:80px;
 }
-
 .profile{
   width:200px;
   height:200px;
   border-radius:50%;
   display:flex;
-  align-items:center;
   justify-content:center;
-  font-size:28px;
-  font-weight:500;
+  align-items:center;
+  font-size:26px;
   cursor:pointer;
-  box-shadow:0 0 45px currentColor;
-  transition:.15s;
+  box-shadow:0 0 40px currentColor;
 }
-.profile:active{transform:scale(.95)}
-
 .isaiah{color:#4cffc3;background:radial-gradient(circle,#2bffc6,#0a4f3a)}
 .guest{color:#3ecbff;background:radial-gradient(circle,#38b6ff,#0a3650)}
 .party{color:#b77cff;background:radial-gradient(circle,#b38cff,#3a1c6b)}
 
-/* ---------- PLAYER ---------- */
+/* Player */
 #player{
   position:absolute;
   inset:0;
   padding:40px 60px;
-  display:none;
 }
-
-/* Top */
 .top{
   display:flex;
   align-items:center;
@@ -83,12 +69,8 @@ canvas#ripple{
   background:radial-gradient(circle,#4cffc3,#0a4f3a);
   box-shadow:0 0 30px #4cffc3;
 }
-.title{
-  font-size:34px;
-  letter-spacing:.5px;
-}
+.title{font-size:34px}
 
-/* Now Playing */
 .now{
   margin-top:35px;
   display:flex;
@@ -101,97 +83,55 @@ canvas#ripple{
   background:linear-gradient(135deg,#0aa,#054);
   box-shadow:0 0 45px rgba(0,255,200,.6);
 }
-.info{flex:1}
-
-.songTitle{
-  font-size:38px;
-}
-.songArtist{
-  font-size:20px;
-  opacity:.75;
-  margin-top:6px;
-}
-
-/* Progress */
-.progress{
-  margin-top:20px;
-}
-.bar{
-  height:8px;
-  background:#123;
-  border-radius:4px;
-  overflow:hidden;
-}
-.fill{
-  height:100%;
-  width:35%;
-  background:linear-gradient(90deg,#4cffc3,#00ff9d);
-}
-.time{
-  display:flex;
-  justify-content:space-between;
-  font-size:14px;
-  opacity:.65;
-  margin-top:6px;
-}
+.songTitle{font-size:36px}
+.songArtist{opacity:.7;margin-top:6px}
 
 /* Controls */
 .controls{
-  margin-top:26px;
+  margin-top:25px;
   display:flex;
   gap:30px;
-  align-items:center;
 }
 .ctrl{
-  font-size:34px;
+  font-size:32px;
   padding:16px 18px;
   border-radius:50%;
   background:rgba(0,255,200,.15);
   box-shadow:0 0 22px rgba(0,255,200,.45);
+  cursor:pointer;
 }
-.ctrl:active{transform:scale(.9)}
 
-/* ---------- PLAYLISTS ---------- */
+/* Playlists */
 .playlists{
   margin-top:40px;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:35px;
 }
-
 .panel{
   background:rgba(0,255,200,.08);
   border-radius:18px;
   padding:20px;
-  box-shadow:0 0 35px rgba(0,255,200,.18);
-  display:flex;
-  flex-direction:column;
 }
-.panel h3{
-  margin:0 0 10px 0;
-  font-weight:500;
-}
-
-/* Scroll */
+.panel h3{margin:0 0 10px}
 .list{
-  overflow-y:auto;
   max-height:220px;
+  overflow-y:auto;
 }
 .track{
-  padding:12px 0;
+  padding:10px 0;
   border-bottom:1px solid rgba(255,255,255,.1);
   cursor:pointer;
 }
-.track:active{color:#4cffc3}
 
 /* Search */
 #search{
-  margin-top:10px;
+  width:100%;
   padding:12px;
   font-size:18px;
   border-radius:12px;
   border:none;
-  width:100%;
+  margin-bottom:10px;
 }
 
 /* Footer */
@@ -208,70 +148,51 @@ canvas#ripple{
   font-size:18px;
   border-radius:14px;
   background:rgba(0,255,200,.2);
-  box-shadow:0 0 20px rgba(0,255,200,.4);
-}
-.btn:active{transform:scale(.95)}
-
-/* Visualizer */
-canvas#viz{
-  position:absolute;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:150px;
-  opacity:.35;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="ripple"></canvas>
-
 <!-- HOME -->
 <div id="home">
-  <div class="profile isaiah" onclick="openPlayer('Isaiah')">Isaiah</div>
-  <div class="profile guest" onclick="openPlayer('Guest')">Guest</div>
-  <div class="profile party" onclick="openPlayer('Party')">Party</div>
+  <div class="profile isaiah" onclick="openProfile('isaiah')">Isaiah</div>
+  <div class="profile guest" onclick="openProfile('guest')">Guest</div>
+  <div class="profile party" onclick="openProfile('party')">Party</div>
 </div>
 
 <!-- PLAYER -->
-<div id="player">
+<div id="player" class="hidden">
   <div class="top">
     <div class="avatar"></div>
-    <div class="title" id="who">Now Playing for Isaiah</div>
+    <div class="title" id="who"></div>
   </div>
 
   <div class="now">
     <div class="cover"></div>
-    <div class="info">
-      <div class="songTitle">Chill Vibes</div>
-      <div class="songArtist">Smooth Beats</div>
-
-      <div class="progress">
-        <div class="bar"><div class="fill"></div></div>
-        <div class="time"><span>1:22</span><span>3:45</span></div>
-      </div>
+    <div>
+      <div class="songTitle" id="songTitle">Select a song</div>
+      <div class="songArtist">GitHub Stream</div>
 
       <div class="controls">
-        <div class="ctrl">⏮</div>
-        <div class="ctrl">⏯</div>
-        <div class="ctrl">⏭</div>
-        <div class="ctrl">🔊</div>
+        <div class="ctrl" onclick="audio.currentTime=0">⏮</div>
+        <div class="ctrl" onclick="toggle()">⏯</div>
+        <div class="ctrl" onclick="audio.currentTime=audio.duration">⏭</div>
+        <div class="ctrl" onclick="audio.volume=Math.min(1,audio.volume+.1)">🔊</div>
       </div>
     </div>
   </div>
 
   <div class="playlists">
     <div class="panel">
-      <h3>Isaiah’s Playlist</h3>
+      <h3>Playlist</h3>
       <input id="search" placeholder="Search songs…">
-      <div class="list" id="list1"></div>
+      <div class="list" id="songs"></div>
     </div>
-
     <div class="panel">
-      <h3>Chill Out Mix</h3>
-      <div class="list" id="list2"></div>
+      <h3>Now Playing</h3>
+      <div class="list" id="nowList"></div>
     </div>
   </div>
 
@@ -281,79 +202,62 @@ canvas#viz{
   </div>
 </div>
 
-<canvas id="viz"></canvas>
+<audio id="audio"></audio>
 
 <script>
-/* ---------- NAV ---------- */
-function openPlayer(name){
-  home.style.display="none";
-  player.style.display="block";
-  who.textContent="Now Playing for "+name;
-}
-function goHome(){
-  player.style.display="none";
-  home.style.display="flex";
+const USER="YOURNAME";
+const REPO="spa-music";
+
+let currentSongs=[];
+let currentProfile="";
+
+function openProfile(profile){
+  currentProfile=profile;
+  home.classList.add("hidden");
+  player.classList.remove("hidden");
+  who.textContent="Now Playing for "+profile;
+  loadSongs();
 }
 
-/* ---------- DEMO SONG DATA ---------- */
-const songs=[
- "Summer Jam","Night Drive","Feel Good Track","Ocean Dreams",
- "Relaxing Groove","Mellow Mood","Late Night Waves","Poolside Chill",
- "Deep Focus","Sunset Vibes","After Dark"
-];
+function goHome(){
+  audio.pause();
+  player.classList.add("hidden");
+  home.classList.remove("hidden");
+}
+
+async function loadSongs(){
+  const r=await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/${currentProfile}`);
+  const data=await r.json();
+  currentSongs=data.filter(f=>f.name.endsWith(".mp3"));
+  render(currentSongs);
+}
 
 function render(list){
-  list1.innerHTML="";
-  list2.innerHTML="";
-  list.forEach(s=>{
+  songs.innerHTML="";
+  list.forEach(f=>{
     const d=document.createElement("div");
     d.className="track";
-    d.textContent=s;
-    list1.appendChild(d.cloneNode(true));
-    list2.appendChild(d);
+    d.textContent=f.name.replace(".mp3","");
+    d.onclick=()=>play(f);
+    songs.appendChild(d);
   });
 }
-render(songs);
+
+function play(file){
+  const url=`https://raw.githubusercontent.com/${USER}/${REPO}/main/${currentProfile}/${file.name}`;
+  audio.src=url;
+  audio.play();
+  songTitle.textContent=file.name.replace(".mp3","");
+}
+
+function toggle(){
+  audio.paused?audio.play():audio.pause();
+}
 
 search.oninput=e=>{
   const q=e.target.value.toLowerCase();
-  render(songs.filter(s=>s.toLowerCase().includes(q)));
+  render(currentSongs.filter(f=>f.name.toLowerCase().includes(q)));
 };
-
-/* ---------- RIPPLE ---------- */
-const rc=ripple.getContext("2d");
-let r=[];
-function rs(){ripple.width=innerWidth;ripple.height=innerHeight}
-rs();onresize=rs;
-addEventListener("pointerdown",e=>r.push({x:e.clientX,y:e.clientY,d:0,o:.6}));
-(function draw(){
-  rc.clearRect(0,0,ripple.width,ripple.height);
-  r.forEach(p=>{
-    rc.beginPath();
-    rc.arc(p.x,p.y,p.d,0,Math.PI*2);
-    rc.strokeStyle=`rgba(0,255,200,${p.o})`;
-    rc.lineWidth=2;
-    rc.shadowBlur=20;
-    rc.shadowColor="rgba(0,255,200,.8)";
-    rc.stroke();
-    p.d+=3;p.o-=.01;
-  });
-  r=r.filter(p=>p.o>0);
-  requestAnimationFrame(draw);
-})();
-
-/* ---------- VISUALIZER ---------- */
-const vx=viz.getContext("2d");
-function vs(){viz.width=innerWidth;viz.height=150}vs();
-(function vdraw(){
-  vx.clearRect(0,0,viz.width,viz.height);
-  for(let i=0;i<50;i++){
-    const h=Math.sin(Date.now()/320+i)*35+60;
-    vx.fillStyle="rgba(0,255,200,.7)";
-    vx.fillRect(i*viz.width/50,viz.height-h,8,h);
-  }
-  requestAnimationFrame(vdraw);
-})();
 </script>
 
 </body>
