@@ -24,19 +24,36 @@ body{
 
 /* HOME */
 #home{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:50px;padding:70px;margin:60px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:50px;
+  padding:70px;
+  margin:60px;
   background:rgba(0,0,0,.35);
   backdrop-filter:blur(10px);
   border-radius:30px;
 }
-#profileTitle{grid-column:1/-1;font-size:40px;text-align:center}
+#profileTitle{
+  grid-column:1/-1;
+  font-size:40px;
+  text-align:center;
+}
 .profile{
-  width:170px;height:170px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;cursor:pointer;
+  width:170px;height:170px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
   box-shadow:0 0 40px currentColor;
   border:3px solid rgba(255,255,255,.15);
+  color:#fff;
+}
+.profile-name{
+  color:#ffffff;
+  font-size:22px;
+  font-weight:600;
+  text-shadow:0 2px 8px rgba(0,0,0,.6);
 }
 .profile:active{transform:scale(.92)}
 .isaiah{color:#4cffc3;background:radial-gradient(circle,#2bffc6,#0a4f3a)}
@@ -63,32 +80,51 @@ body{
 }
 .list{max-height:220px;overflow-y:auto}
 .track{
-  padding:10px;border-bottom:1px solid rgba(255,255,255,.1);
+  padding:10px;
+  border-bottom:1px solid rgba(255,255,255,.1);
   cursor:pointer;
 }
 .track:hover{color:#4cffc3}
 input{
-  width:100%;padding:12px;font-size:16px;
-  border-radius:10px;border:none;margin-bottom:10px;
+  width:100%;
+  padding:12px;
+  font-size:16px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:10px;
 }
 .btn{
-  padding:12px 26px;border-radius:14px;
-  background:rgba(0,255,200,.25);cursor:pointer;
+  padding:12px 26px;
+  border-radius:14px;
+  background:rgba(0,255,200,.25);
+  cursor:pointer;
 }
 .footer{
-  margin-top:20px;display:flex;justify-content:space-between;
+  margin-top:20px;
+  display:flex;
+  justify-content:space-between;
 }
 
 /* FINDER */
 #finder{
-  position:fixed;inset:8%;
+  position:fixed;
+  inset:8%;
   background:rgba(0,0,0,.85);
   backdrop-filter:blur(18px);
-  border-radius:30px;padding:30px;
-  display:none;z-index:10;
+  border-radius:30px;
+  padding:30px;
+  display:none;
+  z-index:10;
 }
-.findResult{padding:14px;border-bottom:1px solid rgba(255,255,255,.1)}
-.findActions{display:flex;gap:12px;margin-top:6px}
+.findResult{
+  padding:14px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.findActions{
+  display:flex;
+  gap:12px;
+  margin-top:6px;
+}
 </style>
 </head>
 
@@ -99,12 +135,25 @@ input{
 
 <div id="home">
   <div id="profileTitle">Who’s listening?</div>
-  <div class="profile isaiah" onclick="openProfile('Isaiah')">Isaiah</div>
-  <div class="profile ryans" onclick="openProfile('Ryan’s Fam')">Ryan’s Fam</div>
-  <div class="profile wakena" onclick="openProfile('Wakena')">Wakena</div>
-  <div class="profile elijah" onclick="openProfile('Elijah')">Elijah</div>
-  <div class="profile pappa" onclick="openProfile('Pappa')">Pappa</div>
-  <div class="profile guest" onclick="openProfile('Guest')">Guest</div>
+
+  <div class="profile isaiah" onclick="openProfile('Isaiah')">
+    <span class="profile-name">Isaiah</span>
+  </div>
+  <div class="profile ryans" onclick="openProfile('Ryan’s Fam')">
+    <span class="profile-name">Ryan’s Fam</span>
+  </div>
+  <div class="profile wakena" onclick="openProfile('Wakena')">
+    <span class="profile-name">Wakena</span>
+  </div>
+  <div class="profile elijah" onclick="openProfile('Elijah')">
+    <span class="profile-name">Elijah</span>
+  </div>
+  <div class="profile pappa" onclick="openProfile('Pappa')">
+    <span class="profile-name">Pappa</span>
+  </div>
+  <div class="profile guest" onclick="openProfile('Guest')">
+    <span class="profile-name">Guest</span>
+  </div>
 </div>
 
 <div id="player">
@@ -145,23 +194,23 @@ input{
 /* ===== STATE ===== */
 let tracks=[],current=0;
 
-/* ===== AUDIO CORE (FIX) ===== */
-const audio = document.getElementById("audio");
-const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-const analyser = audioCtx.createAnalyser();
-analyser.fftSize = 256;
-let source = audioCtx.createMediaElementSource(audio);
+/* ===== AUDIO CORE ===== */
+const audio=document.getElementById("audio");
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+const analyser=audioCtx.createAnalyser();
+analyser.fftSize=256;
+let source=audioCtx.createMediaElementSource(audio);
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
-const dataArray = new Uint8Array(analyser.frequencyBinCount);
+const dataArray=new Uint8Array(analyser.frequencyBinCount);
 
 function loadAndPlay(src){
   audio.pause();
-  audio.src = src;
+  audio.src=src;
   audioCtx.resume();
 
-  try{ source.disconnect(); }catch(e){}
-  source = audioCtx.createMediaElementSource(audio);
+  try{source.disconnect();}catch(e){}
+  source=audioCtx.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
 
@@ -184,7 +233,7 @@ function goHome(){
 function play(i){
   current=i;
   const t=tracks[i];
-  loadAndPlay(t.src || URL.createObjectURL(t.file));
+  loadAndPlay(t.src||URL.createObjectURL(t.file));
 }
 function toggle(){audio.paused?audio.play():audio.pause()}
 function next(){tracks.length&&play((current+1)%tracks.length)}
@@ -192,9 +241,7 @@ function prev(){tracks.length&&play((current-1+tracks.length)%tracks.length)}
 
 /* ===== FILES ===== */
 function addFiles(files){
-  for(const f of files){
-    tracks.push({name:f.name,file:f});
-  }
+  for(const f of files) tracks.push({name:f.name,file:f});
   render();
 }
 function clearProfile(){tracks=[];render()}
@@ -236,13 +283,14 @@ async function searchArchive(q){
   finderResults.innerHTML="";
 
   for(const d of data.response.docs){
+    const title=d.identifier;
     const div=document.createElement("div");
     div.className="findResult";
     div.innerHTML=`
-      <div>${d.identifier}</div>
+      <div>${title}</div>
       <div class="findActions">
         <div class="btn" onclick="previewArchive('${d.identifier}')">▶ Preview</div>
-        <div class="btn" onclick="downloadArchive('${d.identifier}')">⬇ Download</div>
+        <div class="btn" onclick="downloadArchive('${d.identifier}','${title}')">⬇ Download</div>
       </div>`;
     finderResults.appendChild(div);
   }
@@ -251,24 +299,26 @@ async function searchArchive(q){
 async function getArchiveMP3(id){
   const r=await fetch(`https://archive.org/metadata/${id}`);
   const data=await r.json();
-  return data.files.find(f=>f.name && f.name.endsWith(".mp3"));
+  return data.files.find(f=>f.name&&f.name.endsWith(".mp3"));
 }
 
 async function previewArchive(id){
   const mp3=await getArchiveMP3(id);
-  if(!mp3) return alert("No MP3 found");
+  if(!mp3)return alert("No MP3 found");
   loadAndPlay(`https://archive.org/download/${id}/${mp3.name}`);
 }
 
-async function downloadArchive(id){
+async function downloadArchive(id,title){
   const mp3=await getArchiveMP3(id);
-  if(!mp3) return alert("No MP3 found");
+  if(!mp3)return alert("No MP3 found");
 
   const remote=`https://archive.org/download/${id}/${mp3.name}`;
   const blob=await (await fetch(remote)).blob();
   const local=URL.createObjectURL(blob);
 
-  tracks.push({name:mp3.name,src:local});
+  const safeName=title.replace(/[^a-z0-9 _-]/gi,"").trim()||"Track";
+
+  tracks.push({name:safeName+".mp3",src:local});
   render();
 }
 
@@ -294,7 +344,7 @@ function drawWaves(){
     wctx.lineWidth=2;
     wctx.stroke();
   }
-  t++; requestAnimationFrame(drawWaves);
+  t++;requestAnimationFrame(drawWaves);
 }
 drawWaves();
 
