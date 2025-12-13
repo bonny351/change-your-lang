@@ -2,54 +2,85 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Spa Music – Local Files</title>
+<title>Spa Music Kiosk</title>
 
 <style>
 html,body{
   margin:0;
   width:100%;
   height:100%;
-  background:#031018;
   font-family:"Segoe UI",Arial,sans-serif;
   color:#eafff7;
   overflow:hidden;
+  background:black;
 }
-.hidden{display:none}
 
-/* Background */
-body::before{
-  content:"";
-  position:absolute;
+/* BACKGROUND IMAGE */
+body{
+  background:url("background.jpg") no-repeat center center fixed;
+  background-size:cover;
+}
+
+/* DARK GLASS OVERLAY */
+#overlay{
+  position:fixed;
   inset:0;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(0,255,200,.18), transparent 60%),
-    linear-gradient(#020b12,#04202a);
-  z-index:-2;
+  background:radial-gradient(circle,rgba(0,0,0,.2),rgba(0,0,0,.6));
+  z-index:0;
+}
+
+/* WAVES */
+#waves{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* MAIN LAYERS */
+#home,#player{
+  position:relative;
+  z-index:2;
 }
 
 /* HOME */
 #home{
-  position:absolute;
-  inset:0;
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:70px;
+  gap:60px;
   padding:80px;
   justify-items:center;
   align-items:center;
+  background:rgba(0,0,0,.35);
+  backdrop-filter:blur(10px);
+  border-radius:30px;
+  margin:60px;
 }
+
+#profileTitle{
+  grid-column:1/-1;
+  font-size:42px;
+  text-align:center;
+  margin-bottom:30px;
+  text-shadow:0 0 25px rgba(0,255,200,.6);
+}
+
 .profile{
-  width:190px;
-  height:190px;
+  width:180px;
+  height:180px;
   border-radius:50%;
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
-  font-size:24px;
-  font-weight:500;
+  font-size:22px;
   cursor:pointer;
   box-shadow:0 0 45px currentColor;
+  border:3px solid rgba(255,255,255,.15);
 }
+
+.profile:active{transform:scale(.92)}
+
 .isaiah{color:#4cffc3;background:radial-gradient(circle,#2bffc6,#0a4f3a)}
 .ryans{color:#3ecbff;background:radial-gradient(circle,#38b6ff,#0a3650)}
 .wakena{color:#00ffd0;background:radial-gradient(circle,#3dffe2,#0a4f46)}
@@ -58,42 +89,33 @@ body::before{
 .guest{color:#b77cff;background:radial-gradient(circle,#b38cff,#3a1c6b)}
 
 /* PLAYER */
-#player{
-  position:absolute;
-  inset:0;
-  padding:40px 60px;
-}
+#player{display:none;padding:40px 60px}
+
 .top{
   display:flex;
   align-items:center;
   gap:25px;
 }
 .avatar{
-  width:90px;
-  height:90px;
-  border-radius:50%;
+  width:90px;height:90px;border-radius:50%;
   background:radial-gradient(circle,#4cffc3,#0a4f3a);
   box-shadow:0 0 30px currentColor;
 }
 .title{font-size:34px}
 
-/* Now Playing */
 .now{
-  margin-top:35px;
+  margin-top:30px;
   display:flex;
   gap:40px;
 }
 .cover{
-  width:220px;
-  height:220px;
-  border-radius:18px;
+  width:220px;height:220px;border-radius:18px;
   background:linear-gradient(135deg,#0aa,#054);
   box-shadow:0 0 45px rgba(0,255,200,.6);
 }
 .songTitle{font-size:36px}
-.songArtist{opacity:.7;margin-top:6px}
 
-/* Controls */
+/* CONTROLS */
 .controls{
   margin-top:25px;
   display:flex;
@@ -108,7 +130,7 @@ body::before{
   cursor:pointer;
 }
 
-/* Playlists */
+/* PLAYLISTS */
 .playlists{
   margin-top:40px;
   display:grid;
@@ -120,7 +142,6 @@ body::before{
   border-radius:18px;
   padding:20px;
 }
-.panel h3{margin:0 0 10px}
 .list{
   max-height:220px;
   overflow-y:auto;
@@ -132,8 +153,8 @@ body::before{
 }
 .track:hover{color:#4cffc3}
 
-/* Search */
-#search{
+/* SEARCH */
+input{
   width:100%;
   padding:12px;
   font-size:18px;
@@ -142,7 +163,7 @@ body::before{
   margin-bottom:10px;
 }
 
-/* Footer */
+/* FOOTER */
 .footer{
   position:absolute;
   bottom:30px;
@@ -158,23 +179,44 @@ body::before{
   background:rgba(0,255,200,.2);
   cursor:pointer;
 }
+
+/* FINDER */
+#finder{
+  position:fixed;
+  inset:8%;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(18px);
+  border-radius:30px;
+  padding:30px;
+  z-index:10;
+  display:none;
+}
+.findResult{
+  padding:14px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  cursor:pointer;
+}
+.findResult:hover{background:rgba(0,255,200,.15)}
 </style>
 </head>
 
 <body>
 
-<!-- HOME -->
+<div id="overlay"></div>
+<canvas id="waves"></canvas>
+
 <div id="home">
-  <div class="profile isaiah" onclick="openProfile('Isaiah')">Isaiah</div>
-  <div class="profile ryans" onclick="openProfile('Ryan’s Fam')">Ryan’s Fam</div>
-  <div class="profile wakena" onclick="openProfile('Wakena')">Wakena</div>
-  <div class="profile elijah" onclick="openProfile('Elijah')">Elijah</div>
-  <div class="profile pappa" onclick="openProfile('Pappa')">Pappa</div>
-  <div class="profile guest" onclick="openProfile('Guest')">Guest</div>
+  <div id="profileTitle">Who’s listening?</div>
+
+  <div class="profile isaiah" onclick="openProfile('Isaiah')">🎧 Isaiah</div>
+  <div class="profile ryans" onclick="openProfile('Ryan’s Fam')">👨‍👩‍👧‍👦 Ryan’s Fam</div>
+  <div class="profile wakena" onclick="openProfile('Wakena')">🌊 Wakena</div>
+  <div class="profile elijah" onclick="openProfile('Elijah')">🎮 Elijah</div>
+  <div class="profile pappa" onclick="openProfile('Pappa')">🧔 Pappa</div>
+  <div class="profile guest" onclick="openProfile('Guest')">👤 Guest</div>
 </div>
 
-<!-- PLAYER -->
-<div id="player" class="hidden">
+<div id="player">
   <div class="top">
     <div class="avatar"></div>
     <div class="title" id="who"></div>
@@ -184,8 +226,6 @@ body::before{
     <div class="cover"></div>
     <div>
       <div class="songTitle" id="songTitle">Select a song</div>
-      <div class="songArtist">Local MP3</div>
-
       <div class="controls">
         <div class="ctrl" onclick="prev()">⏮</div>
         <div class="ctrl" onclick="toggle()">⏯</div>
@@ -203,80 +243,68 @@ body::before{
     </div>
 
     <div class="panel">
-      <h3>Library</h3>
+      <h3>Add Music</h3>
       <input type="file" accept=".mp3" multiple onchange="addFiles(this.files)">
-      <div class="list" id="library"></div>
+      <div class="btn" onclick="openFinder()">Find Free Music</div>
     </div>
   </div>
 
   <div class="footer">
     <div class="btn" onclick="clearProfile()">Clear Profile</div>
-    <div class="btn" onclick="goHome()">Back to Profiles</div>
+    <div class="btn" onclick="goHome()">Back</div>
   </div>
+</div>
+
+<div id="finder">
+  <h2>Find Free MP3s</h2>
+  <input id="finderSearch" placeholder="Search Internet Archive…">
+  <div id="finderResults"></div>
+  <div class="btn" onclick="closeFinder()">Close</div>
 </div>
 
 <audio id="audio"></audio>
 
 <script>
+/* ===== STATE ===== */
 let profile="";
 let tracks=[];
 let current=0;
 
+/* ===== PROFILE ===== */
 function openProfile(name){
   profile=name;
   who.textContent="Now Playing for "+name;
-  home.classList.add("hidden");
-  player.classList.remove("hidden");
-  load();
+  home.style.display="none";
+  player.style.display="block";
 }
 
 function goHome(){
   audio.pause();
-  player.classList.add("hidden");
-  home.classList.remove("hidden");
+  player.style.display="none";
+  home.style.display="grid";
 }
 
+/* ===== PLAYBACK ===== */
+function play(i){
+  current=i;
+  const t=tracks[i];
+  audio.src=t.url||URL.createObjectURL(t.file);
+  audio.play();
+  songTitle.textContent=t.name.replace(".mp3","");
+}
+function toggle(){audio.paused?audio.play():audio.pause()}
+function next(){if(tracks.length)play((current+1)%tracks.length)}
+function prev(){if(tracks.length)play((current-1+tracks.length)%tracks.length)}
+
+/* ===== FILE ADD ===== */
 function addFiles(files){
   for(const f of files){
     tracks.push({name:f.name,file:f});
   }
-  save();
   render();
 }
 
-function play(i){
-  current=i;
-  audio.src=URL.createObjectURL(tracks[i].file);
-  audio.play();
-  songTitle.textContent=tracks[i].name.replace(".mp3","");
-}
-
-function toggle(){ audio.paused?audio.play():audio.pause(); }
-function next(){ if(tracks.length) play((current+1)%tracks.length); }
-function prev(){ if(tracks.length) play((current-1+tracks.length)%tracks.length); }
-
-function render(){
-  songs.innerHTML="";
-  library.innerHTML="";
-  tracks.forEach((t,i)=>{
-    const d=document.createElement("div");
-    d.className="track";
-    d.textContent=t.name.replace(".mp3","");
-    d.onclick=()=>play(i);
-    songs.appendChild(d.cloneNode(true));
-    library.appendChild(d);
-  });
-}
-
-function save(){
-  localStorage.setItem("music-"+profile, JSON.stringify(tracks.map(t=>t.name)));
-}
-
-function load(){
-  tracks=[];
-  render();
-}
-
+/* ===== SEARCH ===== */
 search.oninput=e=>{
   const q=e.target.value.toLowerCase();
   [...songs.children].forEach(d=>{
@@ -284,10 +312,87 @@ search.oninput=e=>{
   });
 };
 
-function clearProfile(){
-  tracks=[];
-  render();
+/* ===== RENDER ===== */
+function render(){
+  songs.innerHTML="";
+  tracks.forEach((t,i)=>{
+    const d=document.createElement("div");
+    d.className="track";
+    d.textContent=t.name.replace(".mp3","");
+    d.onclick=()=>play(i);
+    songs.appendChild(d);
+  });
 }
+
+/* ===== CLEAR ===== */
+function clearProfile(){tracks=[];render()}
+
+/* ===== FINDER (LEGAL SEARCH) ===== */
+function openFinder(){finder.style.display="block"}
+function closeFinder(){finder.style.display="none"}
+
+finderSearch.onkeydown=e=>{
+  if(e.key==="Enter")searchArchive(e.target.value);
+};
+
+async function searchArchive(q){
+  finderResults.innerHTML="Searching…";
+  const r=await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)} AND mediatype:audio&fl[]=identifier&fl[]=title&rows=20&output=json`);
+  const data=await r.json();
+  finderResults.innerHTML="";
+  data.response.docs.forEach(d=>{
+    const url=`https://archive.org/download/${d.identifier}/${d.identifier}_vbr.mp3`;
+    const div=document.createElement("div");
+    div.className="findResult";
+    div.textContent=d.title||d.identifier;
+    div.onclick=()=>{
+      tracks.push({name:(d.title||d.identifier)+".mp3",url});
+      render();
+      closeFinder();
+    };
+    finderResults.appendChild(div);
+  });
+}
+
+/* ===== WAVES (AUDIO SYNC) ===== */
+const waveCanvas=document.getElementById("waves");
+const wctx=waveCanvas.getContext("2d");
+function resize(){waveCanvas.width=innerWidth;waveCanvas.height=innerHeight}
+resize();addEventListener("resize",resize);
+
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+const analyser=audioCtx.createAnalyser();
+analyser.fftSize=256;
+const source=audioCtx.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+const dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+document.addEventListener("pointerdown",()=>audioCtx.resume(),{once:true});
+
+let t=0;
+function drawWaves(){
+  wctx.clearRect(0,0,waveCanvas.width,waveCanvas.height);
+  analyser.getByteFrequencyData(dataArray);
+  let bass=dataArray.slice(0,10).reduce((a,b)=>a+b,0)/10/255;
+
+  for(let i=0;i<3;i++){
+    wctx.beginPath();
+    const amp=20+bass*50+i*8;
+    const yBase=waveCanvas.height*0.6+i*30;
+    for(let x=0;x<=waveCanvas.width;x+=8){
+      wctx.lineTo(x,yBase+Math.sin(x/180+t*0.02+i)*amp);
+    }
+    wctx.strokeStyle=`rgba(0,255,200,${0.12-i*0.03})`;
+    wctx.lineWidth=2;
+    wctx.shadowBlur=20;
+    wctx.shadowColor="rgba(0,255,200,.4)";
+    wctx.stroke();
+  }
+  t++;
+  requestAnimationFrame(drawWaves);
+}
+drawWaves();
 </script>
 
 </body>
