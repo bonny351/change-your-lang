@@ -5,102 +5,220 @@
 <title>Spa Music Kiosk</title>
 
 <style>
-/* ================= BASE ================= */
 html,body{
   margin:0;
   width:100%;
   height:100%;
-  background:#030b10;
-  font-family:Arial, sans-serif;
-  color:white;
+  font-family:"Segoe UI", Arial, sans-serif;
+  color:#eafff7;
   overflow:hidden;
+  background:#031018;
 }
-.hidden{display:none}
 
-/* ================= BACKGROUND ================= */
+/* ---------- BACKGROUND ---------- */
 body::before{
   content:"";
   position:absolute;
   inset:0;
   background:
-    radial-gradient(circle at center, rgba(0,255,200,.12), transparent 60%),
-    linear-gradient(#02080c,#03141c);
+    radial-gradient(circle at 50% 40%, rgba(0,255,200,.18), transparent 60%),
+    linear-gradient(#020b12,#04202a);
   z-index:-2;
 }
 
-/* ================= RIPPLE ================= */
+/* ---------- RIPPLE ---------- */
 canvas#ripple{
   position:absolute;
   inset:0;
   z-index:-1;
 }
 
-/* ================= HOME ================= */
+/* ---------- HOME ---------- */
 #home{
   position:absolute;
   inset:0;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:60px;
-  padding:80px;
-  justify-items:center;
+  display:flex;
+  justify-content:center;
   align-items:center;
+  gap:90px;
 }
+
 .profile{
-  width:180px;
-  height:180px;
+  width:200px;
+  height:200px;
   border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
-  background:radial-gradient(circle,#1effb0,#0a4f3a);
-  box-shadow:0 0 40px rgba(0,255,200,.6);
+  font-size:28px;
+  font-weight:500;
+  cursor:pointer;
+  box-shadow:0 0 45px currentColor;
+  transition:.15s;
 }
 .profile:active{transform:scale(.95)}
 
-/* ================= PLAYER ================= */
+.isaiah{color:#4cffc3;background:radial-gradient(circle,#2bffc6,#0a4f3a)}
+.guest{color:#3ecbff;background:radial-gradient(circle,#38b6ff,#0a3650)}
+.party{color:#b77cff;background:radial-gradient(circle,#b38cff,#3a1c6b)}
+
+/* ---------- PLAYER ---------- */
 #player{
   position:absolute;
   inset:0;
-  padding:40px;
+  padding:40px 60px;
+  display:none;
 }
-h1{margin:0 0 15px 0}
 
-.song{
-  padding:18px;
-  border-bottom:1px solid rgba(255,255,255,.1);
+/* Top */
+.top{
+  display:flex;
+  align-items:center;
+  gap:25px;
+}
+.avatar{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:radial-gradient(circle,#4cffc3,#0a4f3a);
+  box-shadow:0 0 30px #4cffc3;
+}
+.title{
+  font-size:34px;
+  letter-spacing:.5px;
+}
+
+/* Now Playing */
+.now{
+  margin-top:35px;
+  display:flex;
+  gap:40px;
+}
+.cover{
+  width:220px;
+  height:220px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#0aa,#054);
+  box-shadow:0 0 45px rgba(0,255,200,.6);
+}
+.info{flex:1}
+
+.songTitle{
+  font-size:38px;
+}
+.songArtist{
   font-size:20px;
-}
-.song:active{
-  background:#1db954;
-  color:black;
+  opacity:.75;
+  margin-top:6px;
 }
 
-/* ================= CONTROLS ================= */
-button{
-  padding:14px 26px;
-  border:none;
-  border-radius:12px;
-  background:#1db954;
-  font-size:18px;
+/* Progress */
+.progress{
   margin-top:20px;
 }
-button:active{transform:scale(.95)}
-
-#controls{
-  position:fixed;
-  bottom:30px;
-  right:40px;
+.bar{
+  height:8px;
+  background:#123;
+  border-radius:4px;
+  overflow:hidden;
+}
+.fill{
+  height:100%;
+  width:35%;
+  background:linear-gradient(90deg,#4cffc3,#00ff9d);
+}
+.time{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  opacity:.65;
+  margin-top:6px;
 }
 
-/* ================= VISUALIZER ================= */
+/* Controls */
+.controls{
+  margin-top:26px;
+  display:flex;
+  gap:30px;
+  align-items:center;
+}
+.ctrl{
+  font-size:34px;
+  padding:16px 18px;
+  border-radius:50%;
+  background:rgba(0,255,200,.15);
+  box-shadow:0 0 22px rgba(0,255,200,.45);
+}
+.ctrl:active{transform:scale(.9)}
+
+/* ---------- PLAYLISTS ---------- */
+.playlists{
+  margin-top:40px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:35px;
+}
+
+.panel{
+  background:rgba(0,255,200,.08);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 0 35px rgba(0,255,200,.18);
+  display:flex;
+  flex-direction:column;
+}
+.panel h3{
+  margin:0 0 10px 0;
+  font-weight:500;
+}
+
+/* Scroll */
+.list{
+  overflow-y:auto;
+  max-height:220px;
+}
+.track{
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  cursor:pointer;
+}
+.track:active{color:#4cffc3}
+
+/* Search */
+#search{
+  margin-top:10px;
+  padding:12px;
+  font-size:18px;
+  border-radius:12px;
+  border:none;
+  width:100%;
+}
+
+/* Footer */
+.footer{
+  position:absolute;
+  bottom:30px;
+  left:60px;
+  right:60px;
+  display:flex;
+  justify-content:space-between;
+}
+.btn{
+  padding:14px 28px;
+  font-size:18px;
+  border-radius:14px;
+  background:rgba(0,255,200,.2);
+  box-shadow:0 0 20px rgba(0,255,200,.4);
+}
+.btn:active{transform:scale(.95)}
+
+/* Visualizer */
 canvas#viz{
-  position:fixed;
+  position:absolute;
   bottom:0;
   left:0;
   width:100%;
-  height:160px;
+  height:150px;
   opacity:.35;
 }
 </style>
@@ -112,118 +230,129 @@ canvas#viz{
 
 <!-- HOME -->
 <div id="home">
-  <div class="profile" onclick="openProfile('isaiah')">Isaiah</div>
-  <div class="profile" onclick="openProfile('ryans_fam')">Ryan’s Fam</div>
-  <div class="profile" onclick="openProfile('wakena')">Wakena</div>
-  <div class="profile" onclick="openProfile('elijah')">Elijah</div>
-  <div class="profile" onclick="openProfile('pappa')">Pappa</div>
-  <div class="profile" onclick="openProfile('guest')">Guest</div>
+  <div class="profile isaiah" onclick="openPlayer('Isaiah')">Isaiah</div>
+  <div class="profile guest" onclick="openPlayer('Guest')">Guest</div>
+  <div class="profile party" onclick="openPlayer('Party')">Party</div>
 </div>
 
 <!-- PLAYER -->
-<div id="player" class="hidden">
-  <h1 id="title"></h1>
-  <div id="songs"></div>
+<div id="player">
+  <div class="top">
+    <div class="avatar"></div>
+    <div class="title" id="who">Now Playing for Isaiah</div>
+  </div>
 
-  <div id="controls">
-    <button onclick="logout()">Back</button>
+  <div class="now">
+    <div class="cover"></div>
+    <div class="info">
+      <div class="songTitle">Chill Vibes</div>
+      <div class="songArtist">Smooth Beats</div>
+
+      <div class="progress">
+        <div class="bar"><div class="fill"></div></div>
+        <div class="time"><span>1:22</span><span>3:45</span></div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrl">⏮</div>
+        <div class="ctrl">⏯</div>
+        <div class="ctrl">⏭</div>
+        <div class="ctrl">🔊</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="playlists">
+    <div class="panel">
+      <h3>Isaiah’s Playlist</h3>
+      <input id="search" placeholder="Search songs…">
+      <div class="list" id="list1"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Chill Out Mix</h3>
+      <div class="list" id="list2"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="btn">Shuffle</div>
+    <div class="btn" onclick="goHome()">Back to Profiles</div>
   </div>
 </div>
 
 <canvas id="viz"></canvas>
 
 <script>
-/* ================= RIPPLE EFFECT ================= */
-const rc=document.getElementById("ripple");
-const rx=rc.getContext("2d");
-let ripples=[];
-function resize(){
-  rc.width=innerWidth;
-  rc.height=innerHeight;
+/* ---------- NAV ---------- */
+function openPlayer(name){
+  home.style.display="none";
+  player.style.display="block";
+  who.textContent="Now Playing for "+name;
 }
-resize(); onresize=resize;
+function goHome(){
+  player.style.display="none";
+  home.style.display="flex";
+}
 
-addEventListener("pointerdown",e=>{
-  ripples.push({x:e.clientX,y:e.clientY,r:0,o:.6});
-});
+/* ---------- DEMO SONG DATA ---------- */
+const songs=[
+ "Summer Jam","Night Drive","Feel Good Track","Ocean Dreams",
+ "Relaxing Groove","Mellow Mood","Late Night Waves","Poolside Chill",
+ "Deep Focus","Sunset Vibes","After Dark"
+];
 
-(function drawRipples(){
-  rx.clearRect(0,0,rc.width,rc.height);
-  ripples.forEach(p=>{
-    rx.beginPath();
-    rx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    rx.strokeStyle=`rgba(0,255,200,${p.o})`;
-    rx.lineWidth=2;
-    rx.shadowBlur=20;
-    rx.shadowColor="rgba(0,255,200,.8)";
-    rx.stroke();
-    p.r+=3;
-    p.o-=.01;
+function render(list){
+  list1.innerHTML="";
+  list2.innerHTML="";
+  list.forEach(s=>{
+    const d=document.createElement("div");
+    d.className="track";
+    d.textContent=s;
+    list1.appendChild(d.cloneNode(true));
+    list2.appendChild(d);
   });
-  ripples=ripples.filter(p=>p.o>0);
-  requestAnimationFrame(drawRipples);
+}
+render(songs);
+
+search.oninput=e=>{
+  const q=e.target.value.toLowerCase();
+  render(songs.filter(s=>s.toLowerCase().includes(q)));
+};
+
+/* ---------- RIPPLE ---------- */
+const rc=ripple.getContext("2d");
+let r=[];
+function rs(){ripple.width=innerWidth;ripple.height=innerHeight}
+rs();onresize=rs;
+addEventListener("pointerdown",e=>r.push({x:e.clientX,y:e.clientY,d:0,o:.6}));
+(function draw(){
+  rc.clearRect(0,0,ripple.width,ripple.height);
+  r.forEach(p=>{
+    rc.beginPath();
+    rc.arc(p.x,p.y,p.d,0,Math.PI*2);
+    rc.strokeStyle=`rgba(0,255,200,${p.o})`;
+    rc.lineWidth=2;
+    rc.shadowBlur=20;
+    rc.shadowColor="rgba(0,255,200,.8)";
+    rc.stroke();
+    p.d+=3;p.o-=.01;
+  });
+  r=r.filter(p=>p.o>0);
+  requestAnimationFrame(draw);
 })();
 
-/* ================= NAV ================= */
-function openProfile(profile){
-  fetch("http://localhost:3000/profile",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({profile})
-  }).then(()=>{
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("player").classList.remove("hidden");
-    document.getElementById("title").textContent=profile;
-    loadSongs();
-  });
-}
-
-function logout(){
-  fetch("http://localhost:3000/logout",{method:"POST"});
-  document.getElementById("player").classList.add("hidden");
-  document.getElementById("home").classList.remove("hidden");
-}
-
-/* ================= LOAD SONGS FROM GITHUB ================= */
-function loadSongs(){
-  fetch("http://localhost:3000/songs")
-    .then(r=>r.json())
-    .then(list=>{
-      const box=document.getElementById("songs");
-      box.innerHTML="";
-      list.forEach(s=>{
-        const d=document.createElement("div");
-        d.className="song";
-        d.textContent=s.name.replace(".mp3","");
-        d.onclick=()=>{
-          fetch("http://localhost:3000/play",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({url:s.url})
-          });
-        };
-        box.appendChild(d);
-      });
-    });
-}
-
-/* ================= VISUALIZER ================= */
-const vc=document.getElementById("viz");
-const vx=vc.getContext("2d");
-function vs(){
-  vc.width=innerWidth;
-  vc.height=160;
-}
-vs();
-
-(function drawViz(){
-  vx.clearRect(0,0,vc.width,vc.height);
-  for(let i=0;i<48;i++){
-    const h=Math.sin(Date.now()/350+i)*35+70;
+/* ---------- VISUALIZER ---------- */
+const vx=viz.getContext("2d");
+function vs(){viz.width=innerWidth;viz.height=150}vs();
+(function vdraw(){
+  vx.clearRect(0,0,viz.width,viz.height);
+  for(let i=0;i<50;i++){
+    const h=Math.sin(Date.now()/320+i)*35+60;
     vx.fillStyle="rgba(0,255,200,.7)";
-    vx.fillRect(i*vc.width/48,vc.height-h,8,h);
+    vx.fillRect(i*viz.width/50,viz.height-h,8,h);
   }
-  requestAnimationFrame(drawViz);
+  requestAnimationFrame(vdraw);
 })();
 </script>
 
