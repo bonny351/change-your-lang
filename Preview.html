@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Spa Music – Web</title>
+<title>Spa Music – Local Files</title>
 
 <style>
 html,body{
@@ -27,31 +27,37 @@ body::before{
   z-index:-2;
 }
 
-/* Home */
+/* HOME */
 #home{
   position:absolute;
   inset:0;
-  display:flex;
-  justify-content:center;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:70px;
+  padding:80px;
+  justify-items:center;
   align-items:center;
-  gap:80px;
 }
 .profile{
-  width:200px;
-  height:200px;
+  width:190px;
+  height:190px;
   border-radius:50%;
   display:flex;
-  justify-content:center;
   align-items:center;
-  font-size:26px;
+  justify-content:center;
+  font-size:24px;
+  font-weight:500;
   cursor:pointer;
-  box-shadow:0 0 40px currentColor;
+  box-shadow:0 0 45px currentColor;
 }
 .isaiah{color:#4cffc3;background:radial-gradient(circle,#2bffc6,#0a4f3a)}
-.guest{color:#3ecbff;background:radial-gradient(circle,#38b6ff,#0a3650)}
-.party{color:#b77cff;background:radial-gradient(circle,#b38cff,#3a1c6b)}
+.ryans{color:#3ecbff;background:radial-gradient(circle,#38b6ff,#0a3650)}
+.wakena{color:#00ffd0;background:radial-gradient(circle,#3dffe2,#0a4f46)}
+.elijah{color:#ffd34c;background:radial-gradient(circle,#ffe48a,#5a4a12)}
+.pappa{color:#ff8c4c;background:radial-gradient(circle,#ffb27a,#5a2a12)}
+.guest{color:#b77cff;background:radial-gradient(circle,#b38cff,#3a1c6b)}
 
-/* Player */
+/* PLAYER */
 #player{
   position:absolute;
   inset:0;
@@ -67,10 +73,11 @@ body::before{
   height:90px;
   border-radius:50%;
   background:radial-gradient(circle,#4cffc3,#0a4f3a);
-  box-shadow:0 0 30px #4cffc3;
+  box-shadow:0 0 30px currentColor;
 }
 .title{font-size:34px}
 
+/* Now Playing */
 .now{
   margin-top:35px;
   display:flex;
@@ -123,6 +130,7 @@ body::before{
   border-bottom:1px solid rgba(255,255,255,.1);
   cursor:pointer;
 }
+.track:hover{color:#4cffc3}
 
 /* Search */
 #search{
@@ -157,9 +165,12 @@ body::before{
 
 <!-- HOME -->
 <div id="home">
-  <div class="profile isaiah" onclick="openProfile('isaiah')">Isaiah</div>
-  <div class="profile guest" onclick="openProfile('guest')">Guest</div>
-  <div class="profile party" onclick="openProfile('party')">Party</div>
+  <div class="profile isaiah" onclick="openProfile('Isaiah')">Isaiah</div>
+  <div class="profile ryans" onclick="openProfile('Ryan’s Fam')">Ryan’s Fam</div>
+  <div class="profile wakena" onclick="openProfile('Wakena')">Wakena</div>
+  <div class="profile elijah" onclick="openProfile('Elijah')">Elijah</div>
+  <div class="profile pappa" onclick="openProfile('Pappa')">Pappa</div>
+  <div class="profile guest" onclick="openProfile('Guest')">Guest</div>
 </div>
 
 <!-- PLAYER -->
@@ -173,12 +184,12 @@ body::before{
     <div class="cover"></div>
     <div>
       <div class="songTitle" id="songTitle">Select a song</div>
-      <div class="songArtist">GitHub Stream</div>
+      <div class="songArtist">Local MP3</div>
 
       <div class="controls">
-        <div class="ctrl" onclick="audio.currentTime=0">⏮</div>
+        <div class="ctrl" onclick="prev()">⏮</div>
         <div class="ctrl" onclick="toggle()">⏯</div>
-        <div class="ctrl" onclick="audio.currentTime=audio.duration">⏭</div>
+        <div class="ctrl" onclick="next()">⏭</div>
         <div class="ctrl" onclick="audio.volume=Math.min(1,audio.volume+.1)">🔊</div>
       </div>
     </div>
@@ -190,14 +201,16 @@ body::before{
       <input id="search" placeholder="Search songs…">
       <div class="list" id="songs"></div>
     </div>
+
     <div class="panel">
-      <h3>Now Playing</h3>
-      <div class="list" id="nowList"></div>
+      <h3>Library</h3>
+      <input type="file" accept=".mp3" multiple onchange="addFiles(this.files)">
+      <div class="list" id="library"></div>
     </div>
   </div>
 
   <div class="footer">
-    <div class="btn">Shuffle</div>
+    <div class="btn" onclick="clearProfile()">Clear Profile</div>
     <div class="btn" onclick="goHome()">Back to Profiles</div>
   </div>
 </div>
@@ -205,18 +218,16 @@ body::before{
 <audio id="audio"></audio>
 
 <script>
-const USER="YOURNAME";
-const REPO="spa-music";
+let profile="";
+let tracks=[];
+let current=0;
 
-let currentSongs=[];
-let currentProfile="";
-
-function openProfile(profile){
-  currentProfile=profile;
+function openProfile(name){
+  profile=name;
+  who.textContent="Now Playing for "+name;
   home.classList.add("hidden");
   player.classList.remove("hidden");
-  who.textContent="Now Playing for "+profile;
-  loadSongs();
+  load();
 }
 
 function goHome(){
@@ -225,39 +236,58 @@ function goHome(){
   home.classList.remove("hidden");
 }
 
-async function loadSongs(){
-  const r=await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/${currentProfile}`);
-  const data=await r.json();
-  currentSongs=data.filter(f=>f.name.endsWith(".mp3"));
-  render(currentSongs);
+function addFiles(files){
+  for(const f of files){
+    tracks.push({name:f.name,file:f});
+  }
+  save();
+  render();
 }
 
-function render(list){
+function play(i){
+  current=i;
+  audio.src=URL.createObjectURL(tracks[i].file);
+  audio.play();
+  songTitle.textContent=tracks[i].name.replace(".mp3","");
+}
+
+function toggle(){ audio.paused?audio.play():audio.pause(); }
+function next(){ if(tracks.length) play((current+1)%tracks.length); }
+function prev(){ if(tracks.length) play((current-1+tracks.length)%tracks.length); }
+
+function render(){
   songs.innerHTML="";
-  list.forEach(f=>{
+  library.innerHTML="";
+  tracks.forEach((t,i)=>{
     const d=document.createElement("div");
     d.className="track";
-    d.textContent=f.name.replace(".mp3","");
-    d.onclick=()=>play(f);
-    songs.appendChild(d);
+    d.textContent=t.name.replace(".mp3","");
+    d.onclick=()=>play(i);
+    songs.appendChild(d.cloneNode(true));
+    library.appendChild(d);
   });
 }
 
-function play(file){
-  const url=`https://raw.githubusercontent.com/${USER}/${REPO}/main/${currentProfile}/${file.name}`;
-  audio.src=url;
-  audio.play();
-  songTitle.textContent=file.name.replace(".mp3","");
+function save(){
+  localStorage.setItem("music-"+profile, JSON.stringify(tracks.map(t=>t.name)));
 }
 
-function toggle(){
-  audio.paused?audio.play():audio.pause();
+function load(){
+  tracks=[];
+  render();
 }
 
 search.oninput=e=>{
   const q=e.target.value.toLowerCase();
-  render(currentSongs.filter(f=>f.name.toLowerCase().includes(q)));
+  [...songs.children].forEach(d=>{
+    d.style.display=d.textContent.toLowerCase().includes(q)?"":"none";
+  });
 };
+
+function clearProfile(){
+  tracks=[];
+  render();
+}
 </script>
 
 </body>
