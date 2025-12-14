@@ -24,165 +24,72 @@ body::before{
     radial-gradient(circle at top, rgba(0,255,200,.25), transparent 55%),
     radial-gradient(circle at bottom, rgba(0,140,255,.35), transparent 60%),
     linear-gradient(#020b14,#061b25);
-  z-index:0;
-}
-
-/* ===== SCREEN GRAIN ===== */
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'>\
-<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter>\
-<rect width='120' height='120' filter='url(%23n)' opacity='.035'/>\
-</svg>");
-  pointer-events:none;
-  z-index:4;
 }
 
 /* ===== WAVES ===== */
 #waves{
   position:fixed;
   inset:0;
-  z-index:1;
   pointer-events:none;
 }
 
-/* ===== MAIN LAYOUT ===== */
+/* ===== LAYOUT ===== */
 #app{
   position:relative;
   z-index:2;
-  width:100%;
   height:100%;
+  padding:40px 60px;
   display:flex;
   flex-direction:column;
-  padding:40px 60px;
-  box-sizing:border-box;
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 #header{
   display:flex;
   align-items:center;
   gap:25px;
 }
-
 #avatar{
-  width:90px;
-  height:90px;
-  border-radius:50%;
+  width:90px;height:90px;border-radius:50%;
   background:radial-gradient(circle,#3cffb4,#0a4f3a);
   box-shadow:0 0 35px #3cffb4;
 }
+#profileName{font-size:36px}
 
-#profileName{
-  font-size:36px;
-  font-weight:600;
-}
-
-/* ===== DIVIDER ===== */
-#divider{
-  margin:25px 0;
-  height:3px;
-  width:60%;
-  background:linear-gradient(90deg,#3cffb4,transparent);
-  box-shadow:0 0 20px #3cffb4;
-}
-
-/* ===== NOW PLAYING ===== */
-#nowPlaying{
-  display:flex;
-  gap:35px;
-  align-items:center;
-}
-
+/* PLAYER */
+#nowPlaying{display:flex;gap:35px;margin-top:25px}
 #cover{
-  width:160px;
-  height:160px;
-  border-radius:12px;
+  width:160px;height:160px;border-radius:12px;
   background:linear-gradient(135deg,#ffaa55,#553300);
   box-shadow:0 0 30px rgba(255,170,85,.5);
 }
+#songTitle{font-size:32px;margin:0}
 
-#songInfo h2{
-  font-size:34px;
-  margin:0;
-}
-#songInfo p{
-  opacity:.8;
-  margin-top:6px;
-}
-
-/* ===== PROGRESS ===== */
-#progress{
-  margin-top:20px;
-  width:420px;
-}
-#progress input{
-  width:100%;
-}
-
-/* ===== CONTROLS ===== */
-#controls{
-  display:flex;
-  gap:25px;
-  margin-top:20px;
-}
-
+/* CONTROLS */
+#controls{display:flex;gap:25px;margin-top:15px}
 .ctrl{
-  width:70px;
-  height:70px;
-  border-radius:50%;
+  width:70px;height:70px;border-radius:50%;
   background:radial-gradient(circle,#3cffb4,#0a4f3a);
   box-shadow:0 0 35px #3cffb4;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:30px;
-  cursor:pointer;
-  user-select:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;cursor:pointer;
 }
 
-/* ===== PLAYLIST PANELS ===== */
-#lists{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:30px;
-  margin-top:40px;
-}
+/* PROGRESS */
+#progress{width:420px;margin-top:15px}
 
+/* PLAYLIST */
+#lists{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:35px}
 .panel{
   background:rgba(0,0,0,.35);
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 0 25px rgba(0,255,200,.15);
+  border-radius:16px;padding:20px;
 }
+.song{padding:10px;border-bottom:1px solid rgba(255,255,255,.1);cursor:pointer}
+.song:hover{background:rgba(255,255,255,.08)}
 
-.panel h3{
-  margin:0 0 15px;
-  font-size:20px;
-}
-
-.song{
-  padding:10px;
-  border-bottom:1px solid rgba(255,255,255,.1);
-  cursor:pointer;
-}
-.song:hover{
-  background:rgba(255,255,255,.08);
-}
-
-/* ===== FOOTER ===== */
-#footer{
-  display:flex;
-  justify-content:space-between;
-  margin-top:auto;
-}
-
+#footer{margin-top:auto;display:flex;justify-content:space-between}
 .footerBtn{
-  padding:14px 30px;
-  border-radius:20px;
+  padding:14px 30px;border-radius:20px;
   background:rgba(0,255,200,.18);
   box-shadow:0 0 25px rgba(0,255,200,.4);
   cursor:pointer;
@@ -198,21 +105,14 @@ body::after{
 
   <div id="header">
     <div id="avatar"></div>
-    <div id="profileName">Now Playing</div>
+    <div id="profileName"></div>
   </div>
-
-  <div id="divider"></div>
 
   <div id="nowPlaying">
     <div id="cover"></div>
-    <div id="songInfo">
+    <div>
       <h2 id="songTitle">Select a song</h2>
-      <p>Local Playlist</p>
-
-      <div id="progress">
-        <input type="range" min="0" max="100" value="0">
-      </div>
-
+      <input id="progress" type="range" min="0" max="100" value="0">
       <div id="controls">
         <div class="ctrl">⏮</div>
         <div class="ctrl">▶</div>
@@ -222,11 +122,13 @@ body::after{
   </div>
 
   <div id="lists">
-    <div class="panel"></div>
+    <div class="panel" id="playlist"></div>
     <div class="panel">
-      <h3>Info</h3>
-      <p style="opacity:.7">Tap a song to play.<br>
-      Long-press a song to remove it.</p>
+      <p style="opacity:.7">
+        • Add songs from USB or storage<br>
+        • Long-press a song to remove<br>
+        • Guest resets after 7 hours
+      </p>
     </div>
   </div>
 
@@ -238,158 +140,113 @@ body::after{
 
 </div>
 
-<script>
-/* ================= PROFILE ================= */
-const params = new URLSearchParams(location.search);
-const profile = params.get("profile") || "Isaiah";
-document.getElementById("profileName").textContent =
-  "Now Playing for " + profile;
+<input id="filePick" type="file" accept=".mp3" multiple hidden>
 
-/* ================= GUEST TIMEOUT ================= */
-const GUEST_TIMEOUT = 7 * 60 * 60 * 1000; // 7 hours
+<script>
+/* PROFILE */
+const params = new URLSearchParams(location.search);
+const profile = params.get("profile") || "Guest";
+profileName.textContent = "Now Playing for " + profile;
+
+/* GUEST TIMER */
+const GUEST_TIMEOUT = 7 * 60 * 60 * 1000;
 const now = Date.now();
-const STORAGE_KEY = "playlist_" + profile;
+const KEY = "playlist_" + profile;
 
 if(profile === "Guest"){
-  const last = localStorage.getItem("guest_last_active");
+  const last = localStorage.getItem("guest_last");
   if(!last || now - last > GUEST_TIMEOUT){
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(KEY);
   }
-  localStorage.setItem("guest_last_active", now);
+  localStorage.setItem("guest_last", now);
 }
 
-/* ================= AUDIO ================= */
+/* AUDIO */
 const audio = new Audio();
-audio.volume = 0.7;
-
-let playlist = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-  { title:"Summer Jam", file:"music/summer-jam.mp3" },
-  { title:"Night Drive", file:"music/night-drive.mp3" }
-];
-
 let current = 0;
-const songTitle = document.getElementById("songTitle");
-const progress = document.querySelector("#progress input");
-const playlistPanel = document.querySelector(".panel");
+let playlist = JSON.parse(localStorage.getItem(KEY)) || [];
 
-/* ================= SAVE ================= */
-function savePlaylist(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(playlist));
-  if(profile === "Guest"){
-    localStorage.setItem("guest_last_active", Date.now());
-  }
+/* SAVE */
+function save(){
+  localStorage.setItem(KEY, JSON.stringify(playlist));
+  if(profile === "Guest") localStorage.setItem("guest_last", Date.now());
 }
 
-/* ================= RENDER PLAYLIST ================= */
-function renderPlaylist(){
-  playlistPanel.innerHTML = `<h3>${profile}’s Playlist</h3>`;
-
-  playlist.forEach((song, i) => {
-    const d = document.createElement("div");
-    d.className = "song";
-    d.textContent = song.title;
-    d.onclick = () => playSong(i);
-
-    d.oncontextmenu = e => {
+/* RENDER */
+function render(){
+  playlistDiv.innerHTML = `<h3>${profile}’s Playlist</h3>`;
+  playlist.forEach((s,i)=>{
+    const d=document.createElement("div");
+    d.className="song";
+    d.textContent=s.name;
+    d.onclick=()=>play(i);
+    d.oncontextmenu=e=>{
       e.preventDefault();
-      if(confirm("Remove this song?")){
+      if(confirm("Remove song?")){
         playlist.splice(i,1);
-        savePlaylist();
-        renderPlaylist();
+        save();render();
       }
     };
-    playlistPanel.appendChild(d);
+    playlistDiv.appendChild(d);
   });
-
-  const add = document.createElement("div");
-  add.className = "song";
-  add.textContent = "➕ Add Song";
-  add.onclick = addSong;
-  playlistPanel.appendChild(add);
+  const add=document.createElement("div");
+  add.className="song";
+  add.textContent="➕ Add from USB / Storage";
+  add.onclick=()=>filePick.click();
+  playlistDiv.appendChild(add);
 }
+const playlistDiv=document.getElementById("playlist");
 
-/* ================= PLAYBACK ================= */
-function playSong(i){
-  current = i;
-  audio.src = playlist[i].file;
+/* ADD FILES */
+filePick.onchange=()=>{
+  [...filePick.files].forEach(f=>{
+    playlist.push({ name:f.name.replace(".mp3",""), src:URL.createObjectURL(f) });
+  });
+  save();render();
+};
+
+/* PLAYBACK */
+function play(i){
+  current=i;
+  audio.src=playlist[i].src;
   audio.play();
-  songTitle.textContent = playlist[i].title;
+  songTitle.textContent=playlist[i].name;
 }
+document.querySelectorAll(".ctrl")[0].onclick=()=>play((current-1+playlist.length)%playlist.length);
+document.querySelectorAll(".ctrl")[1].onclick=()=>audio.paused?audio.play():audio.pause();
+document.querySelectorAll(".ctrl")[2].onclick=()=>play((current+1)%playlist.length);
 
-const ctrls = document.querySelectorAll(".ctrl");
-ctrls[0].onclick = () =>
-  playSong((current - 1 + playlist.length) % playlist.length);
-
-ctrls[1].onclick = () => {
-  if(audio.paused){
-    audio.play();
-    ctrls[1].textContent = "⏸";
-  } else {
-    audio.pause();
-    ctrls[1].textContent = "▶";
-  }
+audio.ontimeupdate=()=>{
+  if(audio.duration) progress.value=(audio.currentTime/audio.duration)*100;
+};
+progress.oninput=()=>{
+  if(audio.duration) audio.currentTime=(progress.value/100)*audio.duration;
 };
 
-ctrls[2].onclick = () =>
-  playSong((current + 1) % playlist.length);
+/* INIT */
+render();
 
-/* ================= PROGRESS ================= */
-audio.ontimeupdate = () => {
-  if(audio.duration){
-    progress.value =
-      (audio.currentTime / audio.duration) * 100;
-  }
-};
-
-progress.oninput = () => {
-  if(audio.duration){
-    audio.currentTime =
-      (progress.value / 100) * audio.duration;
-  }
-};
-
-/* ================= ADD SONG ================= */
-function addSong(){
-  const title = prompt("Song title:");
-  const file = prompt("MP3 path (example: music/song.mp3)");
-  if(title && file){
-    playlist.push({ title, file });
-    savePlaylist();
-    renderPlaylist();
-  }
-}
-
-/* ================= INIT ================= */
-renderPlaylist();
-
-/* ================= WAVES ================= */
-const c=document.getElementById("waves");
-const ctx=c.getContext("2d");
+/* WAVES */
+const c=waves,ctx=c.getContext("2d");
 function resize(){c.width=innerWidth;c.height=innerHeight}
 resize();addEventListener("resize",resize);
-
 let t=0;
-function draw(){
+(function draw(){
   ctx.clearRect(0,0,c.width,c.height);
   for(let i=0;i<3;i++){
     ctx.beginPath();
     for(let x=0;x<=c.width;x+=6){
-      ctx.lineTo(
-        x,
-        c.height*0.82 +
-        Math.sin(x/160 + t + i)*25
-      );
+      ctx.lineTo(x,c.height*.82+Math.sin(x/160+t+i)*25);
     }
-    ctx.strokeStyle=`rgba(0,255,200,${0.25-i*0.06})`;
+    ctx.strokeStyle=`rgba(0,255,200,${0.25-i*.06})`;
     ctx.lineWidth=3;
     ctx.shadowBlur=20;
     ctx.shadowColor="#3cffb4";
     ctx.stroke();
   }
-  t+=0.02;
+  t+=.02;
   requestAnimationFrame(draw);
-}
-draw();
+})();
 </script>
 
 </body>
