@@ -38,7 +38,7 @@ body::before{
   pointer-events:none;
 }
 
-/* APP LAYOUT */
+/* APP */
 #app{
   position:relative;
   z-index:2;
@@ -121,7 +121,6 @@ body::before{
   gap:clamp(12px,3vw,30px);
   margin-top:clamp(16px,4vw,35px);
 }
-
 @media (min-width:900px){
   #lists{ grid-template-columns:1fr 1fr; }
 }
@@ -131,7 +130,6 @@ body::before{
   border-radius:16px;
   padding:20px;
 }
-
 .song{
   padding:10px;
   border-bottom:1px solid rgba(255,255,255,.1);
@@ -146,7 +144,6 @@ body::before{
   left:clamp(12px,3vw,24px);
   z-index:10;
 }
-
 .footerBtn{
   padding:14px 26px;
   border-radius:20px;
@@ -203,114 +200,137 @@ body::before{
 <input id="filePick" type="file" accept=".mp3" multiple hidden>
 
 <script>
-/* PROFILE */
-const params=new URLSearchParams(location.search);
-const profile=params.get("profile")||"Guest";
-profileName.textContent="Now Playing for "+profile;
+/* ================= PROFILE ================= */
+const params = new URLSearchParams(location.search);
+const profile = params.get("profile") || "Guest";
+profileName.textContent = "Now Playing for " + profile;
 
-/* GUEST TIMEOUT */
-const GUEST_TIMEOUT=7*60*60*1000;
-const now=Date.now();
-const KEY="playlist_"+profile;
+/* ================= GUEST TIMEOUT ================= */
+const GUEST_TIMEOUT = 7 * 60 * 60 * 1000;
+const now = Date.now();
+const KEY = "playlist_" + profile;
 
-if(profile==="Guest"){
-  const last=localStorage.getItem("guest_last");
-  if(!last||now-last>GUEST_TIMEOUT){
+if(profile === "Guest"){
+  const last = localStorage.getItem("guest_last");
+  if(!last || now - last > GUEST_TIMEOUT){
     localStorage.removeItem(KEY);
   }
-  localStorage.setItem("guest_last",now);
+  localStorage.setItem("guest_last", now);
 }
 
-/* AUDIO */
-const audio=new Audio();
-let current=0;
-let playlist=JSON.parse(localStorage.getItem(KEY))||[];
+/* ================= AUDIO ================= */
+const audio = new Audio();
 
-/* SAVE */
+/* ---- AUDIO UNLOCK (CRITICAL) ---- */
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContextClass();
+const source = audioCtx.createMediaElementSource(audio);
+source.connect(audioCtx.destination);
+
+function unlockAudio(){
+  if(audioCtx.state !== "running"){
+    audioCtx.resume();
+  }
+  document.removeEventListener("pointerdown", unlockAudio);
+  document.removeEventListener("keydown", unlockAudio);
+}
+document.addEventListener("pointerdown", unlockAudio);
+document.addEventListener("keydown", unlockAudio);
+
+let current = 0;
+let playlist = JSON.parse(localStorage.getItem(KEY)) || [];
+
+/* ================= SAVE ================= */
 function save(){
-  localStorage.setItem(KEY,JSON.stringify(playlist));
-  if(profile==="Guest") localStorage.setItem("guest_last",Date.now());
+  localStorage.setItem(KEY, JSON.stringify(playlist));
+  if(profile === "Guest") localStorage.setItem("guest_last", Date.now());
 }
 
-/* RENDER */
+/* ================= RENDER ================= */
+const playlistDiv = document.getElementById("playlist");
 function render(){
-  playlistDiv.innerHTML=`<h3>${profile}’s Playlist</h3>`;
+  playlistDiv.innerHTML = `<h3>${profile}’s Playlist</h3>`;
   playlist.forEach((s,i)=>{
-    const d=document.createElement("div");
-    d.className="song";
-    d.textContent=s.name;
-    d.onclick=()=>play(i);
-    d.oncontextmenu=e=>{
+    const d = document.createElement("div");
+    d.className = "song";
+    d.textContent = s.name;
+    d.onclick = () => play(i);
+    d.oncontextmenu = e=>{
       e.preventDefault();
       if(confirm("Remove song?")){
         playlist.splice(i,1);
-        save();render();
+        save(); render();
       }
     };
     playlistDiv.appendChild(d);
   });
-  const add=document.createElement("div");
-  add.className="song";
-  add.textContent="➕ Add from USB / Storage";
-  add.onclick=()=>filePick.click();
+  const add = document.createElement("div");
+  add.className = "song";
+  add.textContent = "➕ Add from USB / Storage";
+  add.onclick = ()=>filePick.click();
   playlistDiv.appendChild(add);
 }
-const playlistDiv=document.getElementById("playlist");
 
-/* FILE PICK */
-filePick.onchange=()=>{
+/* ================= FILE PICK ================= */
+filePick.onchange = ()=>{
   [...filePick.files].forEach(f=>{
     playlist.push({
-      name:f.name.replace(".mp3",""),
-      src:URL.createObjectURL(f)
+      name: f.name.replace(".mp3",""),
+      src: URL.createObjectURL(f)
     });
   });
-  save();render();
+  save(); render();
 };
 
-/* PLAYBACK */
+/* ================= PLAYBACK ================= */
 function play(i){
-  current=i;
-  audio.src=playlist[i].src;
+  current = i;
+  audio.src = playlist[i].src;
   audio.play();
-  songTitle.textContent=playlist[i].name;
+  songTitle.textContent = playlist[i].name;
+  if(audioCtx.state !== "running") audioCtx.resume();
 }
-const ctrls=document.querySelectorAll(".ctrl");
-ctrls[0].onclick=()=>play((current-1+playlist.length)%playlist.length);
-ctrls[1].onclick=()=>audio.paused?audio.play():audio.pause();
-ctrls[2].onclick=()=>play((current+1)%playlist.length);
 
-audio.ontimeupdate=()=>{
-  if(audio.duration)
-    progress.value=(audio.currentTime/audio.duration)*100;
+const ctrls = document.querySelectorAll(".ctrl");
+ctrls[0].onclick = ()=>play((current-1+playlist.length)%playlist.length);
+ctrls[1].onclick = ()=>audio.paused ? audio.play() : audio.pause();
+ctrls[2].onclick = ()=>play((current+1)%playlist.length);
+
+audio.ontimeupdate = ()=>{
+  if(audio.duration){
+    progress.value = (audio.currentTime / audio.duration) * 100;
+  }
 };
-progress.oninput=()=>{
-  if(audio.duration)
-    audio.currentTime=(progress.value/100)*audio.duration;
+progress.oninput = ()=>{
+  if(audio.duration){
+    audio.currentTime = (progress.value / 100) * audio.duration;
+  }
 };
 
-/* INIT */
+/* ================= INIT ================= */
 render();
 
-/* WAVES */
-const c=waves,ctx=c.getContext("2d");
-function resize(){c.width=innerWidth;c.height=innerHeight}
-resize();addEventListener("resize",resize);
+/* ================= WAVES ================= */
+const c = waves;
+const ctx = c.getContext("2d");
+function resize(){ c.width=innerWidth; c.height=innerHeight }
+resize(); addEventListener("resize", resize);
+
 let t=0;
 (function draw(){
   ctx.clearRect(0,0,c.width,c.height);
   for(let i=0;i<3;i++){
     ctx.beginPath();
     for(let x=0;x<=c.width;x+=6){
-      ctx.lineTo(x,c.height*.82+Math.sin(x/160+t+i)*25);
+      ctx.lineTo(x, c.height*.82 + Math.sin(x/160+t+i)*25);
     }
-    ctx.strokeStyle=`rgba(0,255,200,${0.25-i*.06})`;
-    ctx.lineWidth=3;
-    ctx.shadowBlur=20;
-    ctx.shadowColor="#3cffb4";
+    ctx.strokeStyle = `rgba(0,255,200,${0.25-i*.06})`;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "#3cffb4";
     ctx.stroke();
   }
-  t+=.02;
+  t += .02;
   requestAnimationFrame(draw);
 })();
 </script>
