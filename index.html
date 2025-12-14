@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, height=device-height,
+initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>Pick Your Profile</title>
 
 <style>
@@ -9,53 +14,21 @@ html,body{
   margin:0;
   width:100%;
   height:100%;
+  background:#040f14;
   font-family:"Segoe UI",system-ui,sans-serif;
-  background:#050f14;
-  overflow:hidden;
   color:white;
+  overflow:hidden;
 }
 
-/* ===== BASE BACKGROUND ===== */
+/* ===== BACKGROUND ===== */
 body::before{
   content:"";
   position:fixed;
   inset:0;
   background:
-    radial-gradient(circle at bottom, rgba(0,120,255,.35), transparent 55%),
-    radial-gradient(circle at top, rgba(0,255,200,.25), transparent 60%),
-    linear-gradient(#020b14,#061a24);
-  z-index:0;
-}
-
-/* ===== SCREEN GRAIN ===== */
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'>\
-<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter>\
-<rect width='120' height='120' filter='url(%23n)' opacity='.035'/>\
-</svg>");
-  pointer-events:none;
-  z-index:4;
-}
-
-/* ===== FOG ===== */
-#fog{
-  position:fixed;
-  inset:-20%;
-  background:
-    radial-gradient(circle at 30% 40%, rgba(255,255,255,.06), transparent 60%),
-    radial-gradient(circle at 70% 60%, rgba(0,255,200,.08), transparent 55%);
-  animation:fogMove 18s linear infinite;
-  pointer-events:none;
-  z-index:1;
-}
-
-@keyframes fogMove{
-  from{transform:translateX(0)}
-  to{transform:translateX(-15%)}
+    radial-gradient(circle at top, rgba(0,255,200,.25), transparent 55%),
+    radial-gradient(circle at bottom, rgba(0,140,255,.35), transparent 60%),
+    linear-gradient(#020b14,#061b25);
 }
 
 /* ===== WAVES ===== */
@@ -63,120 +36,94 @@ body::after{
   position:fixed;
   inset:0;
   pointer-events:none;
-  z-index:1;
 }
 
-/* ===== MAIN SCREEN ===== */
-#profileScreen{
+/* ===== APP ===== */
+#app{
   position:relative;
   z-index:2;
-  width:100%;
-  height:100%;
+  height:100svh;
+  padding:clamp(16px,4vw,50px);
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
+  box-sizing:border-box;
 }
 
+/* ===== TITLE ===== */
 h1{
-  font-size:42px;
-  margin-bottom:55px;
-  letter-spacing:1px;
+  margin-top:clamp(10px,4vw,30px);
+  margin-bottom:clamp(20px,5vw,50px);
+  font-size:clamp(28px,6vw,46px);
+  font-weight:600;
+  text-shadow:0 0 25px rgba(0,255,200,.6);
 }
 
-/* ===== GRID ===== */
+/* ===== PROFILE GRID ===== */
 #profiles{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:60px;
+  grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+  gap:clamp(20px,5vw,40px);
+  width:100%;
+  max-width:900px;
 }
 
-/* ===== PROFILE BUTTON ===== */
+/* ===== PROFILE CARD ===== */
 .profile{
-  width:190px;
-  height:190px;
+  aspect-ratio:1/1;
   border-radius:50%;
+  background:
+    radial-gradient(circle at top,
+      rgba(255,255,255,.35),
+      rgba(0,255,200,.25) 40%,
+      rgba(0,0,0,.6) 70%);
+  box-shadow:
+    0 0 40px rgba(0,255,200,.45),
+    inset 0 0 30px rgba(255,255,255,.25);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
-  font-weight:600;
   cursor:pointer;
-  color:white;
-  text-shadow:0 2px 10px rgba(0,0,0,.7);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease;
   position:relative;
+}
+
+.profile:hover{
+  transform:scale(1.08);
   box-shadow:
-    0 0 30px currentColor,
-    inset 0 0 25px rgba(255,255,255,.25);
-  transition:transform .15s ease, box-shadow .15s ease;
+    0 0 60px rgba(0,255,200,.85),
+    inset 0 0 40px rgba(255,255,255,.35);
 }
 
-.profile:active{
-  transform:scale(.92);
-  box-shadow:0 0 70px currentColor;
+/* ===== PROFILE NAME ===== */
+.profile span{
+  font-size:clamp(18px,4vw,24px);
+  font-weight:600;
+  text-shadow:0 0 20px rgba(0,255,200,.8);
+  pointer-events:none;
 }
 
-/* inner glow */
-.profile::before{
-  content:"";
-  position:absolute;
-  inset:14px;
-  border-radius:50%;
-  background:radial-gradient(circle, rgba(255,255,255,.35), transparent 65%);
-  mix-blend-mode:screen;
-}
-
-/* outer neon bloom */
+/* ===== SUBTLE REFLECTION ===== */
 .profile::after{
   content:"";
   position:absolute;
-  inset:-18px;
-  border-radius:50%;
-  background:radial-gradient(circle, currentColor 0%, transparent 65%);
-  filter:blur(18px);
-  opacity:.9;
-  z-index:-1;
+  bottom:-14%;
+  left:15%;
+  width:70%;
+  height:25%;
+  background:radial-gradient(ellipse,
+    rgba(0,255,200,.35),
+    transparent 70%);
+  filter:blur(12px);
 }
 
-/* reflection */
-.profile-reflect{
-  position:absolute;
-  width:100%;
-  height:60px;
-  top:100%;
-  background:
-    radial-gradient(circle at center,
-      rgba(255,255,255,.35),
-      transparent 70%);
-  filter:blur(10px);
-  opacity:.35;
-  transform:scaleY(.4);
-}
-
-/* ===== COLORS ===== */
-.isaiah{
-  color:#3cffb4;
-  background:radial-gradient(circle,#3cffb4,#0a4f3a);
-}
-.ryans{
-  color:#3ecbff;
-  background:radial-gradient(circle,#38b6ff,#0a3650);
-}
-.wakena{
-  color:#00ffd0;
-  background:radial-gradient(circle,#3dffe2,#0a4f46);
-}
-.elijah{
-  color:#ffd34c;
-  background:radial-gradient(circle,#ffe48a,#5a4a12);
-}
-.pappa{
-  color:#ff9b4c;
-  background:radial-gradient(circle,#ffb27a,#5a2a12);
-}
-.guest{
-  color:#b77cff;
-  background:radial-gradient(circle,#c29bff,#3a1c6b);
+/* ===== FOOTER ===== */
+#hint{
+  margin-top:auto;
+  opacity:.7;
+  font-size:14px;
 }
 </style>
 </head>
@@ -184,77 +131,55 @@ h1{
 <body>
 
 <canvas id="waves"></canvas>
-<div id="fog"></div>
 
-<div id="profileScreen">
+<div id="app">
   <h1>Pick Your Profile</h1>
 
   <div id="profiles">
-    <div class="profile isaiah" onclick="go('Isaiah')">
-      Isaiah<div class="profile-reflect"></div>
-    </div>
-    <div class="profile ryans" onclick="go('Ryan’s Fam')">
-      Ryan’s Fam<div class="profile-reflect"></div>
-    </div>
-    <div class="profile wakena" onclick="go('Wakena')">
-      Wakena<div class="profile-reflect"></div>
-    </div>
-
-    <div class="profile elijah" onclick="go('Elijah')">
-      Elijah<div class="profile-reflect"></div>
-    </div>
-    <div class="profile pappa" onclick="go('Pappa')">
-      Pappa<div class="profile-reflect"></div>
-    </div>
-    <div class="profile guest" onclick="go('Guest')">
-      Guest<div class="profile-reflect"></div>
-    </div>
+    <div class="profile" onclick="go('Isaiah')"><span>Isaiah</span></div>
+    <div class="profile" onclick="go('Ryan')"><span>Ryan’s Fam</span></div>
+    <div class="profile" onclick="go('Wakena')"><span>Wakena</span></div>
+    <div class="profile" onclick="go('Elijah')"><span>Elijah</span></div>
+    <div class="profile" onclick="go('Pappa')"><span>Pappa</span></div>
+    <div class="profile" onclick="go('Guest')"><span>Guest</span></div>
   </div>
+
+  <div id="hint">Tap a profile to continue</div>
 </div>
 
 <script>
-/* ===== NAVIGATION ===== */
-function go(profile){
-  window.location.href =
-    "player.html?profile=" + encodeURIComponent(profile);
+/* NAV */
+function go(name){
+  location.href = "player.html?profile=" + encodeURIComponent(name);
 }
 
-/* ===== WAVES ===== */
-const c=document.getElementById("waves");
-const ctx=c.getContext("2d");
-
-function resize(){
-  c.width=innerWidth;
-  c.height=innerHeight;
-}
-resize();
-addEventListener("resize",resize);
+/* WAVES */
+const c = waves;
+const ctx = c.getContext("2d");
+function resize(){ c.width=innerWidth; c.height=innerHeight }
+resize(); addEventListener("resize", resize);
 
 let t=0;
-function draw(){
+(function draw(){
   ctx.clearRect(0,0,c.width,c.height);
-
-  for(let layer=0;layer<3;layer++){
+  for(let i=0;i<3;i++){
     ctx.beginPath();
-    const amp=30+layer*12;
     for(let x=0;x<=c.width;x+=6){
       ctx.lineTo(
         x,
-        c.height*0.55 +
-        Math.sin(x/140 + t + layer)*amp
+        c.height*.82 +
+        Math.sin(x/160 + t + i)*25
       );
     }
-    ctx.strokeStyle=`rgba(80,200,255,${0.25-layer*0.07})`;
-    ctx.lineWidth=3-layer*0.6;
+    ctx.strokeStyle=`rgba(0,255,200,${0.22-i*.06})`;
+    ctx.lineWidth=3;
     ctx.shadowBlur=20;
-    ctx.shadowColor="#4cffc3";
+    ctx.shadowColor="#3cffb4";
     ctx.stroke();
   }
-
-  t+=0.02;
+  t+=.02;
   requestAnimationFrame(draw);
-}
-draw();
+})();
 </script>
 
 </body>
