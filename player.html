@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, height=device-height,
+initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>Now Playing</title>
 
 <style>
@@ -15,7 +20,7 @@ html,body{
   overflow:hidden;
 }
 
-/* ===== BACKGROUND ===== */
+/* BACKGROUND */
 body::before{
   content:"";
   position:fixed;
@@ -26,70 +31,125 @@ body::before{
     linear-gradient(#020b14,#061b25);
 }
 
-/* ===== WAVES ===== */
+/* WAVES */
 #waves{
   position:fixed;
   inset:0;
   pointer-events:none;
 }
 
-/* ===== LAYOUT ===== */
+/* APP LAYOUT */
 #app{
   position:relative;
   z-index:2;
-  height:100%;
-  padding:40px 60px;
+  height:100svh;
+  padding:clamp(12px,4vw,40px);
   display:flex;
   flex-direction:column;
+  box-sizing:border-box;
 }
 
 /* HEADER */
 #header{
   display:flex;
   align-items:center;
-  gap:25px;
+  gap:clamp(12px,4vw,25px);
 }
 #avatar{
-  width:90px;height:90px;border-radius:50%;
+  width:clamp(60px,12vw,90px);
+  height:clamp(60px,12vw,90px);
+  border-radius:50%;
   background:radial-gradient(circle,#3cffb4,#0a4f3a);
   box-shadow:0 0 35px #3cffb4;
 }
-#profileName{font-size:36px}
+#profileName{
+  font-size:clamp(22px,5vw,36px);
+  font-weight:600;
+}
 
-/* PLAYER */
-#nowPlaying{display:flex;gap:35px;margin-top:25px}
+/* NOW PLAYING */
+#nowPlaying{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:clamp(16px,4vw,35px);
+  margin-top:clamp(10px,3vw,25px);
+}
+
 #cover{
-  width:160px;height:160px;border-radius:12px;
+  width:clamp(100px,22vw,160px);
+  height:clamp(100px,22vw,160px);
+  border-radius:12px;
   background:linear-gradient(135deg,#ffaa55,#553300);
   box-shadow:0 0 30px rgba(255,170,85,.5);
 }
-#songTitle{font-size:32px;margin:0}
 
-/* CONTROLS */
-#controls{display:flex;gap:25px;margin-top:15px}
-.ctrl{
-  width:70px;height:70px;border-radius:50%;
-  background:radial-gradient(circle,#3cffb4,#0a4f3a);
-  box-shadow:0 0 35px #3cffb4;
-  display:flex;align-items:center;justify-content:center;
-  font-size:30px;cursor:pointer;
+#songTitle{
+  font-size:clamp(22px,5vw,32px);
+  margin:0;
 }
 
 /* PROGRESS */
-#progress{width:420px;margin-top:15px}
+#progress{
+  width:min(100%,420px);
+  margin-top:12px;
+}
 
-/* PLAYLIST */
-#lists{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:35px}
+/* CONTROLS */
+#controls{
+  display:flex;
+  gap:clamp(16px,4vw,25px);
+  margin-top:12px;
+}
+.ctrl{
+  width:clamp(56px,12vw,70px);
+  height:clamp(56px,12vw,70px);
+  border-radius:50%;
+  background:radial-gradient(circle,#3cffb4,#0a4f3a);
+  box-shadow:0 0 35px #3cffb4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:clamp(24px,6vw,30px);
+  cursor:pointer;
+}
+
+/* PLAYLISTS */
+#lists{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(12px,3vw,30px);
+  margin-top:clamp(16px,4vw,35px);
+}
+
+@media (min-width:900px){
+  #lists{ grid-template-columns:1fr 1fr; }
+}
+
 .panel{
   background:rgba(0,0,0,.35);
-  border-radius:16px;padding:20px;
+  border-radius:16px;
+  padding:20px;
 }
-.song{padding:10px;border-bottom:1px solid rgba(255,255,255,.1);cursor:pointer}
-.song:hover{background:rgba(255,255,255,.08)}
 
-#footer{margin-top:auto;display:flex;justify-content:space-between}
+.song{
+  padding:10px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  cursor:pointer;
+}
+.song:hover{ background:rgba(255,255,255,.08); }
+
+/* FOOTER */
+#footer{
+  position:fixed;
+  bottom:clamp(12px,3vw,24px);
+  left:clamp(12px,3vw,24px);
+  z-index:10;
+}
+
 .footerBtn{
-  padding:14px 30px;border-radius:20px;
+  padding:14px 26px;
+  border-radius:20px;
   background:rgba(0,255,200,.18);
   box-shadow:0 0 25px rgba(0,255,200,.4);
   cursor:pointer;
@@ -125,56 +185,56 @@ body::before{
     <div class="panel" id="playlist"></div>
     <div class="panel">
       <p style="opacity:.7">
-        • Add songs from USB or storage<br>
-        • Long-press a song to remove<br>
-        • Guest resets after 7 hours
+        • Add songs from USB / SD / storage<br>
+        • Long-press to remove<br>
+        • Guest wipes after 7 hours
       </p>
     </div>
   </div>
 
-  <div id="footer">
-    <div class="footerBtn" onclick="location.href='index.html'">
-      Back to Profiles
-    </div>
-  </div>
+</div>
 
+<div id="footer">
+  <div class="footerBtn" onclick="location.href='index.html'">
+    ← Back to Profiles
+  </div>
 </div>
 
 <input id="filePick" type="file" accept=".mp3" multiple hidden>
 
 <script>
 /* PROFILE */
-const params = new URLSearchParams(location.search);
-const profile = params.get("profile") || "Guest";
-profileName.textContent = "Now Playing for " + profile;
+const params=new URLSearchParams(location.search);
+const profile=params.get("profile")||"Guest";
+profileName.textContent="Now Playing for "+profile;
 
-/* GUEST TIMER */
-const GUEST_TIMEOUT = 7 * 60 * 60 * 1000;
-const now = Date.now();
-const KEY = "playlist_" + profile;
+/* GUEST TIMEOUT */
+const GUEST_TIMEOUT=7*60*60*1000;
+const now=Date.now();
+const KEY="playlist_"+profile;
 
-if(profile === "Guest"){
-  const last = localStorage.getItem("guest_last");
-  if(!last || now - last > GUEST_TIMEOUT){
+if(profile==="Guest"){
+  const last=localStorage.getItem("guest_last");
+  if(!last||now-last>GUEST_TIMEOUT){
     localStorage.removeItem(KEY);
   }
-  localStorage.setItem("guest_last", now);
+  localStorage.setItem("guest_last",now);
 }
 
 /* AUDIO */
-const audio = new Audio();
-let current = 0;
-let playlist = JSON.parse(localStorage.getItem(KEY)) || [];
+const audio=new Audio();
+let current=0;
+let playlist=JSON.parse(localStorage.getItem(KEY))||[];
 
 /* SAVE */
 function save(){
-  localStorage.setItem(KEY, JSON.stringify(playlist));
-  if(profile === "Guest") localStorage.setItem("guest_last", Date.now());
+  localStorage.setItem(KEY,JSON.stringify(playlist));
+  if(profile==="Guest") localStorage.setItem("guest_last",Date.now());
 }
 
 /* RENDER */
 function render(){
-  playlistDiv.innerHTML = `<h3>${profile}’s Playlist</h3>`;
+  playlistDiv.innerHTML=`<h3>${profile}’s Playlist</h3>`;
   playlist.forEach((s,i)=>{
     const d=document.createElement("div");
     d.className="song";
@@ -197,10 +257,13 @@ function render(){
 }
 const playlistDiv=document.getElementById("playlist");
 
-/* ADD FILES */
+/* FILE PICK */
 filePick.onchange=()=>{
   [...filePick.files].forEach(f=>{
-    playlist.push({ name:f.name.replace(".mp3",""), src:URL.createObjectURL(f) });
+    playlist.push({
+      name:f.name.replace(".mp3",""),
+      src:URL.createObjectURL(f)
+    });
   });
   save();render();
 };
@@ -212,15 +275,18 @@ function play(i){
   audio.play();
   songTitle.textContent=playlist[i].name;
 }
-document.querySelectorAll(".ctrl")[0].onclick=()=>play((current-1+playlist.length)%playlist.length);
-document.querySelectorAll(".ctrl")[1].onclick=()=>audio.paused?audio.play():audio.pause();
-document.querySelectorAll(".ctrl")[2].onclick=()=>play((current+1)%playlist.length);
+const ctrls=document.querySelectorAll(".ctrl");
+ctrls[0].onclick=()=>play((current-1+playlist.length)%playlist.length);
+ctrls[1].onclick=()=>audio.paused?audio.play():audio.pause();
+ctrls[2].onclick=()=>play((current+1)%playlist.length);
 
 audio.ontimeupdate=()=>{
-  if(audio.duration) progress.value=(audio.currentTime/audio.duration)*100;
+  if(audio.duration)
+    progress.value=(audio.currentTime/audio.duration)*100;
 };
 progress.oninput=()=>{
-  if(audio.duration) audio.currentTime=(progress.value/100)*audio.duration;
+  if(audio.duration)
+    audio.currentTime=(progress.value/100)*audio.duration;
 };
 
 /* INIT */
