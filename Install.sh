@@ -2,7 +2,7 @@
 set -e
 
 echo "=============================================="
-echo " Spa Music Kiosk – FINAL ONE-FILE INSTALLER "
+echo " Spa Music Kiosk – FINAL INSTALLER "
 echo "=============================================="
 echo
 
@@ -28,7 +28,7 @@ fi
 # -----------------------------
 # INSTALL PACKAGES
 # -----------------------------
-echo "[1/7] Installing required packages..."
+echo "[1/5] Installing required packages..."
 sudo apt update -y
 sudo apt install -y \
   chromium \
@@ -43,13 +43,13 @@ sudo apt install -y \
 # -----------------------------
 # CREATE KIOSK DIRECTORY
 # -----------------------------
-echo "[2/7] Creating kiosk directory..."
+echo "[2/5] Creating kiosk directory..."
 mkdir -p "$KIOSK_DIR"
 
 # -----------------------------
-# START-KIOSK SCRIPT
+# CREATE START SCRIPT
 # -----------------------------
-echo "[3/7] Creating kiosk startup script..."
+echo "[3/5] Creating kiosk startup script..."
 
 cat << EOF > "$KIOSK_DIR/start-kiosk.sh"
 #!/bin/bash
@@ -70,7 +70,7 @@ pkill xfce4-panel || true
 # Hide mouse after 5 seconds
 unclutter -idle 5 &
 
-# Start key bindings
+# Start key listener
 xbindkeys &
 
 # Bluetooth auto-connect
@@ -98,7 +98,7 @@ chmod +x "$KIOSK_DIR/start-kiosk.sh"
 # -----------------------------
 # BLUETOOTH AUTO-CONNECT
 # -----------------------------
-echo "[4/7] Creating Bluetooth auto-connect..."
+echo "[4/5] Creating Bluetooth auto-connect..."
 
 cat << EOF > "$KIOSK_DIR/bt-autoconnect.sh"
 #!/bin/bash
@@ -112,10 +112,8 @@ EOF
 chmod +x "$KIOSK_DIR/bt-autoconnect.sh"
 
 # -----------------------------
-# SECRET BLUETOOTH SETTINGS
+# SECRET ACCESS (BLUETOOTH)
 # -----------------------------
-echo "[5/7] Creating secret Bluetooth access..."
-
 cat << EOF > "$KIOSK_DIR/secret-bluetooth.sh"
 #!/bin/bash
 INPUT=\$(zenity --password --title="Bluetooth Access")
@@ -164,7 +162,7 @@ EOF
 # -----------------------------
 # AUTOSTART
 # -----------------------------
-echo "[6/7] Enabling autostart..."
+echo "[5/5] Enabling autostart..."
 
 mkdir -p "$AUTOSTART_DIR"
 
@@ -181,17 +179,18 @@ echo "=============================================="
 echo " INSTALL COMPLETE"
 echo "=============================================="
 echo
-echo "Bluetooth MAC: $BT_MAC"
-echo "ALL PASSWORDS: 20903"
+echo "NEXT STEPS (ONLY THESE TWO):"
 echo
-echo "Secret Bluetooth access:"
-echo " - Ctrl + Alt + B"
-echo " - OR hold top-left corner 5 seconds"
+echo "1️⃣ Copy your files into:"
+echo "   /home/kali/kiosk/"
 echo
-echo "Put index.html + player.html in:"
-echo " $KIOSK_DIR"
+echo "   Required:"
+echo "   - index.html"
+echo "   - player.html"
+echo "   - your .mp3 files"
 echo
-echo "Reboot to start kiosk:"
-echo " sudo reboot"
+echo "2️⃣ Reboot:"
+echo "   sudo reboot"
 echo
+echo "That’s it."
 echo "=============================================="
