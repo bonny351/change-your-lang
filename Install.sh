@@ -9,7 +9,7 @@ echo
 # -----------------------------
 # VARIABLES (FINAL)
 # -----------------------------
-USER_NAME="kali"
+USER_NAME="isaiah@raspberrypi"
 HOME_DIR="/home/$USER_NAME"
 KIOSK_DIR="$HOME_DIR/kiosk"
 AUTOSTART_DIR="$HOME_DIR/.config/autostart"
