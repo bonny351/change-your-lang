@@ -7,10 +7,10 @@ echo "=============================================="
 echo
 
 # -----------------------------
-# VARIABLES (FINAL)
+# AUTO-DETECTED VARIABLES
 # -----------------------------
-USER_NAME="isaiah@raspberrypi"
-HOME_DIR="/home/$USER_NAME"
+USER_NAME="$(whoami)"
+HOME_DIR="$HOME"
 KIOSK_DIR="$HOME_DIR/kiosk"
 AUTOSTART_DIR="$HOME_DIR/.config/autostart"
 
@@ -18,10 +18,10 @@ BT_MAC="FC:58:FA:4F:2E:7C"
 MASTER_PASSWORD="20903"
 
 # -----------------------------
-# SAFETY CHECK
+# SAFETY CHECK (NOT ROOT)
 # -----------------------------
-if [ "$USER" != "$USER_NAME" ]; then
-  echo "❌ Run this as user: $USER_NAME"
+if [ "$EUID" -eq 0 ]; then
+  echo "❌ Do NOT run this as root"
   exit 1
 fi
 
@@ -55,8 +55,8 @@ cat << EOF > "$KIOSK_DIR/start-kiosk.sh"
 #!/bin/bash
 
 # Clear Chromium session every boot
-rm -rf $HOME_DIR/.config/chromium
-rm -rf $HOME_DIR/.cache/chromium
+rm -rf "$HOME/.config/chromium"
+rm -rf "$HOME/.cache/chromium"
 
 # Disable screen blanking
 xset s off
@@ -74,10 +74,10 @@ unclutter -idle 5 &
 xbindkeys &
 
 # Bluetooth auto-connect
-$KIOSK_DIR/bt-autoconnect.sh &
+"$KIOSK_DIR/bt-autoconnect.sh" &
 
-# Secret touch corner
-$KIOSK_DIR/secret-corner.sh &
+# Secret access corner
+"$KIOSK_DIR/secret-corner.sh" &
 
 sleep 5
 
@@ -90,7 +90,7 @@ chromium \
   --disable-translate \
   --disable-features=TranslateUI \
   --autoplay-policy=no-user-gesture-required \
-  file://$KIOSK_DIR/index.html
+  file://"$KIOSK_DIR/index.html"
 EOF
 
 chmod +x "$KIOSK_DIR/start-kiosk.sh"
@@ -112,7 +112,7 @@ EOF
 chmod +x "$KIOSK_DIR/bt-autoconnect.sh"
 
 # -----------------------------
-# SECRET ACCESS (BLUETOOTH)
+# SECRET BLUETOOTH ACCESS
 # -----------------------------
 cat << EOF > "$KIOSK_DIR/secret-bluetooth.sh"
 #!/bin/bash
@@ -179,10 +179,10 @@ echo "=============================================="
 echo " INSTALL COMPLETE"
 echo "=============================================="
 echo
-echo "NEXT STEPS (ONLY THESE TWO):"
+echo "NEXT STEPS:"
 echo
 echo "1️⃣ Copy your files into:"
-echo "   /home/kali/kiosk/"
+echo "   $KIOSK_DIR/"
 echo
 echo "   Required:"
 echo "   - index.html"
